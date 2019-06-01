@@ -40,9 +40,6 @@ public class Main {
     }
 
 
-    //babad
-
-    //cbbd
     private int palindromeLen(String s){
         boolean flag = false;
         int l = 0, r = s.length() - 1;
