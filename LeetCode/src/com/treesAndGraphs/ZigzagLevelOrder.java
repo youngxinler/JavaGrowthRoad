@@ -1,47 +1,103 @@
 package com.treesAndGraphs;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ZigzagLevelOrder {
-    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+    //节点入栈方向变化
+    public List<List<Integer>> zigzagLevelOrder_1(TreeNode root) {
         List<List<Integer>> res = new ArrayList<>();
         if (root == null) return res;
-        LinkedList<TreeNode> linkedList = new LinkedList<>();
-        int lastNum = 1;
-        int index = 1;
-        linkedList.add(root);
-        while (!linkedList.isEmpty()) {
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(root);
+        boolean flag = true;
+        while (!stack.empty()) {
+            List<TreeNode> cur = new ArrayList<>();
             List<Integer> item = new ArrayList<>();
-            int now = 0;
-            for (int i = 0; i < lastNum; i++) {
-                TreeNode cur = linkedList.pollFirst();
-                if (index % 2 == 0) {
-                    if (cur.left != null) {
-                        linkedList.add(cur.left);
-                        now++;
-                    }
-                    if (cur.right != null) {
-                        linkedList.add(cur.right);
-                        now++;
-                    }
-                } else {
-                    if (cur.right != null) {
-                        linkedList.add(cur.right);
-                        now++;
-                    }
-                    if (cur.left != null) {
-                        linkedList.add(cur.left);
-                        now++;
-                    }
-                }
-                item.add(cur.val);
+            int size = stack.size();
+            //for(int i = 0; i < stack.size(); i++) 这样错了, 在这里卡了半天, stack一直pop, size不是我们想要的值
+            for (int i = 0; i < size; i++) {
+                TreeNode treeNode = stack.pop();
+                cur.add(treeNode);
+                item.add(treeNode.val);
             }
-            index++;
-            lastNum = now;
+
+            if (flag) {
+                for (int i = 0; i < cur.size(); i++) {
+                    TreeNode t = cur.get(i);
+                    if (t.left != null) stack.push(t.left);
+                    if (t.right != null) stack.push(t.right);
+                }
+            } else {
+                for (int i = 0; i < cur.size(); i++) {
+                    TreeNode t = cur.get(i);
+                    if (t.right != null) stack.push(t.right);
+                    if (t.left != null) stack.push(t.left);
+                }
+            }
+            flag = !flag;
             res.add(item);
         }
         return res;
     }
+
+
+    //数值入数组的方向变化
+    public List<List<Integer>> zigzagLevelOrder_2(TreeNode root) {
+        List<List<Integer>> res = new LinkedList<>();
+        if (root == null) return res;
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        deque.offer(root);
+        boolean flag = true;
+        while (!deque.isEmpty()) {
+            List<Integer> item = new LinkedList<>();
+            List<TreeNode> cur = new LinkedList<>();
+            int size = deque.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode t = deque.poll();
+                cur.add(t);
+                if (t.left != null) deque.offer(t.left);
+                if (t.right != null) deque.offer(t.right);
+            }
+            if (flag) {
+                for (int i = 0; i < cur.size(); i++) {
+                    item.add(cur.get(i).val);
+                }
+            } else {
+                for (int i = cur.size() - 1; i >= 0; i--) {
+                    item.add(cur.get(i).val);
+                }
+            }
+            flag = !flag;
+            res.add(item);
+        }
+        return res;
+    }
+
+
+    //好愚蠢, 竟然没想BFS
+
+    private List<List<Integer>> res = new ArrayList<>();
+
+    //BFS
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        dfs(root, 0);
+        for (int i = 0; i < res.size(); i++) {
+            if (i % 2 != 0) {
+                Collections.reverse(res.get(i));
+            }
+        }
+        return res;
+    }
+
+    private void dfs(TreeNode root, int level) {
+        if (root == null) return;
+        if (res.size() < level + 1) {
+            List<Integer> cur = new ArrayList<>();
+            res.add(cur);
+        }
+        res.get(level).add(root.val);
+        if (root.left != null) dfs(root.left, level + 1);
+        if (root.right != null) dfs(root.right, level + 1);
+    }
 }
+
