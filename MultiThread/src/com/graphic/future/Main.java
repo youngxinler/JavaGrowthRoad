@@ -19,5 +19,6 @@ public class Main {
         System.out.println("data2 = " + data2.getContent());
         System.out.println("data3 = " + data3.getContent());
         System.out.println("main END");
+
     }
 }
