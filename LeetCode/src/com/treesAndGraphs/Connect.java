@@ -8,15 +8,17 @@ package com.treesAndGraphs;
 public class Connect {
     public Node connect(Node root) {
         if (root == null) return null;
-        traver(root);
+        Node cur = root;
+        while (cur != null) {
+            if (cur.left != null) {
+                cur.left.next = cur.right;
+            }
+            if (cur.right != null && cur.next != null) {
+                cur.right.next = cur.next.left;
+            }
+            cur = cur.next;
+        }
+        connect(root.left);
         return root;
-    }
-
-    private void traver(Node root) {
-        if (root.left != null) {
-            root.left.next = root.right;
-        } else return;
-        traver(root.left);
-        traver(root.right);
     }
 }
