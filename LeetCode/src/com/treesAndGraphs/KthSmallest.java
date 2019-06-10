@@ -1,24 +1,26 @@
 package com.treesAndGraphs;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class KthSmallest {
-    private List<Integer> nums = new ArrayList<>();
 
-    public int kthSmallest(TreeNode root, int k) {
-        traver(root);
-        return nums.get(k - 1);
+    //dfs 中序遍历, 返回第k个元素
+    private int res = 0;
+    private int target = 1;
+    private int n = 0;
+
+    private int kthSmallest(TreeNode root, int k) {
+        target = k;
+        visit(root);
+        return res;
     }
 
-    private void traver(TreeNode root) {
+    private void visit(TreeNode root) {
         if (root == null) return;
-        if (root.left != null) {
-            traver(root.left);
+        visit(root.left);
+        n++;
+        if (n == target) {
+            res = root.val;
+            return;
         }
-        nums.add(root.val);
-        if (root.right != null) {
-            traver(root.right);
-        }
+        visit(root.right);
     }
 }
