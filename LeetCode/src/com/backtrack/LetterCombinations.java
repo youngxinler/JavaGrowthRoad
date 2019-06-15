@@ -7,17 +7,16 @@ import java.util.Map;
 
 public class LetterCombinations {
 
-    private final Map<String, String> map = new HashMap<>(9);
-//    {{
-//        put("2", "abc");
-//        put("3", "def");
-//        put("4", "ghi");
-//        put("5", "jkl");
-//        put("6", "mno");
-//        put("7", "pqrs");
-//        put("8", "tuv");
-//        put("9", "wxyz");
-//    }};
+    private final Map<String, String> map = new HashMap<String, String>(9) {{
+        put("2", "abc");
+        put("3", "def");
+        put("4", "ghi");
+        put("5", "jkl");
+        put("6", "mno");
+        put("7", "pqrs");
+        put("8", "tuv");
+        put("9", "wxyz");
+    }};
 
     private final List<String> res = new ArrayList<>(500);
 
