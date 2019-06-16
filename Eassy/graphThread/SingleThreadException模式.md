@@ -2,7 +2,7 @@
 当多个线程同时对可变实例进行操作的情况下,  实例就会变成非线程安全.
 
 #### 实现的方式
-**Synchronized关键字**
+**Synchronized关键字** <br/>
 synchronized使得指定的方法或者代码块只能串行执行, 也就是同一时间段, 只能有一个线程能对synchronized锁定的地方进行访问.
  - synchronized 声明在方法上
 	默认锁定的对象是this
