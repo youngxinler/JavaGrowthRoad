@@ -14,7 +14,7 @@ Java的学习总结, 目前主要内容为LeetCode题解和多线程设计模式
 - [Immutable模式](https://github.com/youngxinler/JavaGrowthRoad/tree/master/MultiThread/src/com/graphic/immutable)
 - [Guarded Suspension模式](https://github.com/youngxinler/JavaGrowthRoad/tree/master/MultiThread/src/com/graphic/guardedSuspension)
 - [Balking模式](https://github.com/youngxinler/JavaGrowthRoad/tree/master/MultiThread/src/com/graphic/balking)
-- [Producer-Consumer模式](https://github.com/youngxinler/JavaGrowthRoad/tree/master/MultiThread/src/com/graphic/producerAndComsumer)
+- [Producer-Consumer模式](https://github.com/youngxinler/JavaGrowthRoad/tree/master/MultiThread/src/com/graphic/producerAndConsumer)
 - [Read-Write-Lock模式](https://github.com/youngxinler/JavaGrowthRoad/tree/master/MultiThread/src/com/graphic/readWriteLock)
 - [Thread-Per-Message模式](https://github.com/youngxinler/JavaGrowthRoad/tree/master/MultiThread/src/com/graphic/threadPerMessage)
 - [Worker Thread模式](https://github.com/youngxinler/JavaGrowthRoad/tree/master/MultiThread/src/com/graphic/workerThread)
