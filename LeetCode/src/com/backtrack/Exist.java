@@ -22,7 +22,8 @@ public class Exist {
     private boolean backTrack(int i, int j, int index, boolean[][] visited, char[][] board, String word) {
         if (index == word.length()) return true;
         //判断边界, 以及节点是否被重复使用.
-        if (i >= board.length || i < 0 || j >= board[0].length || j < 0 || visited[i][j]) {
+        if (i >= board.length || i < 0 || j >= board[0].length || j < 0 || visited[i][j] ||
+                word.charAt(index) != board[i][j]) {
             return false;
         }
         //防止节点复用.
