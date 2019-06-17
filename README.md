@@ -1,5 +1,5 @@
 ### JavaGrowthRoad
-Java的学习总结, 目前里面主要内容为LeetCode题解和多线程设计模式,会慢慢进行扩展
+Java的学习总结, 目前主要内容为LeetCode题解和多线程设计模式,会慢慢进行扩展.
 
 #### <i class="fas fa-tags"></i>LeetCode题解
 >努力刷题中, 做好算法, 不只做CURD!
