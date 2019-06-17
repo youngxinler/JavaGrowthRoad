@@ -16,7 +16,7 @@ synchronized使得指定的方法或者代码块只能串行执行, 也就是同
 
 #### 代码示例:
 ```java
-package com.graphic.singleThreadExecution;
+package com.graphic.singleThreadException;
 
 
 public class Gate {
@@ -50,7 +50,7 @@ public class Gate {
 ```
 
 ```java
-package com.graphic.singleThreadExecution;
+package com.graphic.singleThreadException;
 
 public class UserThread extends Thread {
     private final Gate gate;
@@ -75,7 +75,7 @@ public class UserThread extends Thread {
 ```
 
 ```java
-package com.graphic.singleThreadExecution;
+package com.graphic.singleThreadException;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package com.graphic.singleThreadExecution;
+package com.graphic.singleThreadException;
 
 public class UserThread extends Thread {
     private final Gate gate;
