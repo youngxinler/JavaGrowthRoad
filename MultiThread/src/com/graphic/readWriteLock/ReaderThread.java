@@ -14,17 +14,13 @@ public class ReaderThread extends Thread {
 
     @Override
     public void run() {
-//        try {
-//            while (true) {
-//                char[] readbuf = data.read();
-//                System.out.println(Thread.currentThread().getName() + " reads " + String.valueOf(readbuf));
-//            }
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-        while (true) {
-            char[] readbuf = data.read();
-            System.out.println(Thread.currentThread().getName() + " reads " + String.valueOf(readbuf));
+        try {
+            while (true) {
+                char[] readbuf = data.read();
+                System.out.println(Thread.currentThread().getName() + " reads " + String.valueOf(readbuf));
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

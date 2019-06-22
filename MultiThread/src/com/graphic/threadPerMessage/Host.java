@@ -1,35 +1,32 @@
 package com.graphic.threadPerMessage;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author youngxinler  19-6-2 上午10:17
  * @version 0.1
  **/
 
-//最原始版本
-//public class Host {
-//    private final Helper helper = new Helper();
-//
-//    public Host() {
-//    }
 
-//    //如果内部类使用了方法参数, 那么必须对参数加上final, 否则会报错
-//    public void request(final int count, final char c){
-//        System.out.println("request begin " + count + " " + c);
-//
-//        //  每个request 委托新的线程去执行
-//        // 适合如果处理的时间特别长, 而且对操作顺序和返回值没有要求
-//        new Thread(){
-//            @Override
-//            public void run(){
-//                helper.handle(count, c);
-//            }
-//        }.start();
-//        System.out.println("request end " + count + " " + c);
-//    }
-//}
+public class Host {
+    private final Helper helper = new Helper();
+
+    public Host() {
+    }
+
+    //如果内部类使用了方法参数, 那么必须对参数加上final, 否则会报错
+    public void request(final int count, final char c) {
+        System.out.println("request begin " + count + " " + c);
+
+        //  每个request 委托新的线程去执行
+        // 适合如果处理的时间特别长, 而且对操作顺序和返回值没有要求
+        new Thread() {
+            @Override
+            public void run() {
+                helper.handle(count, c);
+            }
+        }.start();
+        System.out.println("request end " + count + " " + c);
+    }
+}
 
 
 //Runnable 接口
@@ -116,27 +113,27 @@ import java.util.concurrent.TimeUnit;
 
 //scheduledExecutorService 接口           调度执行
 //对线程的执行时间进行控制, 推迟操作的执行
-public class Host {
-    private final Helper helper = new Helper();
-    private final ScheduledExecutorService scheduledExecutorService;
-
-    public Host(ScheduledExecutorService scheduledExecutorService) {
-        this.scheduledExecutorService = scheduledExecutorService;
-    }
-
-    public void request(final int count, final char c) {
-        System.out.println("request begin " + count + " " + c);
-        scheduledExecutorService.schedule(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        helper.handle(count, c);
-                    }
-                },
-                3L,
-                TimeUnit.SECONDS
-        );
-        System.out.println("request end " + count + " " + c);
-    }
-}
+//public class Host {
+//    private final Helper helper = new Helper();
+//    private final ScheduledExecutorService scheduledExecutorService;
+//
+//    public Host(ScheduledExecutorService scheduledExecutorService) {
+//        this.scheduledExecutorService = scheduledExecutorService;
+//    }
+//
+//    public void request(final int count, final char c) {
+//        System.out.println("request begin " + count + " " + c);
+//        scheduledExecutorService.schedule(
+//                new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        helper.handle(count, c);
+//                    }
+//                },
+//                3L,
+//                TimeUnit.SECONDS
+//        );
+//        System.out.println("request end " + count + " " + c);
+//    }
+//}
 
