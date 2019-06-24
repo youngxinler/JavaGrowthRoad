@@ -3,6 +3,8 @@ package com.dynamicProgram;
 /**
  * @author youngxinler  2019/6/24 17:11
  **/
+
+//跳跃游戏
 public class CanJump {
     public boolean canJump_1(int[] nums) {
         if (nums.length == 1) return true;
