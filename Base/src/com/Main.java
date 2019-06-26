@@ -1,6 +1,6 @@
 package com;
 
-import com.yEnum.EnumSingleInstance;
+import com.myEnum.EnumSingleInstance;
 
 /**
  * @author youngxinler  19-6-20 下午3:55

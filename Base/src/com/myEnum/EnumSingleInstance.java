@@ -1,4 +1,4 @@
-package com.yEnum;
+package com.myEnum;
 
 /**
  * @author youngxinler  19-6-20 下午5:40

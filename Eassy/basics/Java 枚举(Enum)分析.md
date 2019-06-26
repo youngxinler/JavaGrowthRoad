@@ -7,7 +7,7 @@
 #### 枚举的示例
 ###### 示例1:
 ```java
-package com.yEnum;
+package com.myEnum;
 
 public enum Day {
     SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY;
@@ -73,22 +73,22 @@ Your weight on NEPTUNE is 199.207413
 经过java -p 反编译过的示例2:
 
 ```java
-public final class com.yEnum.Planet extends java.lang.Enum<com.yEnum.Planet> {
-  public static final com.yEnum.Planet MERCURY;
-  public static final com.yEnum.Planet VENUS;
-  public static final com.yEnum.Planet EARTH;
-  public static final com.yEnum.Planet MARS;
-  public static final com.yEnum.Planet JUPITER;
-  public static final com.yEnum.Planet SATURN;
-  public static final com.yEnum.Planet URANUS;
-  public static final com.yEnum.Planet NEPTUNE;
+public final class com.myEnum.Planet extends java.lang.Enum<com.myEnum.Planet> {
+  public static final com.myEnum.Planet MERCURY;
+  public static final com.myEnum.Planet VENUS;
+  public static final com.myEnum.Planet EARTH;
+  public static final com.myEnum.Planet MARS;
+  public static final com.myEnum.Planet JUPITER;
+  public static final com.myEnum.Planet SATURN;
+  public static final com.myEnum.Planet URANUS;
+  public static final com.myEnum.Planet NEPTUNE;
   private final double mass;
   private final double radius;
   public static final double G;
-  private static final com.yEnum.Planet[] $VALUES;
-  public static com.yEnum.Planet[] values();
-  public static com.yEnum.Planet valueOf(java.lang.String);
-  private com.yEnum.Planet(double, double);
+  private static final com.myEnum.Planet[] $VALUES;
+  public static com.myEnum.Planet[] values();
+  public static com.myEnum.Planet valueOf(java.lang.String);
+  private com.myEnum.Planet(double, double);
   private double mass();
   private double radius();
   double surfaceGravity();

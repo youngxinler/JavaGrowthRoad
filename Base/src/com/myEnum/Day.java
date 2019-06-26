@@ -1,4 +1,4 @@
-package com.yEnum;
+package com.myEnum;
 
 public enum Day {
     SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY;
