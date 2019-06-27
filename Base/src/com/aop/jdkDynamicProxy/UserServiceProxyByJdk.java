@@ -15,7 +15,6 @@ public class UserServiceProxyByJdk implements InvocationHandler {
         this.target = target;
     }
 
-    @Override
     public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
         System.out.println("---begin " + method.getName());
         Object result = method.invoke(target, objects);
