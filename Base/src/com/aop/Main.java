@@ -1,8 +1,9 @@
 package com.aop;
 
-import com.aop.staticProxy.UserService;
-import com.aop.staticProxy.UserServiceImpl;
-import com.aop.staticProxy.UserServiceProxy;
+
+import com.aop.jdkDynamicProxy.UserService;
+import com.aop.jdkDynamicProxy.UserServiceImpl;
+import com.aop.jdkDynamicProxy.UserServiceProxyByJdk;
 
 /**
  * @author youngxinler  19-6-26 下午7:26
@@ -11,8 +12,9 @@ import com.aop.staticProxy.UserServiceProxy;
 
 public class Main {
     public static void main(String[] args) {
-        UserService userService = new UserServiceImpl();
-        UserServiceProxy userServiceProxy = new UserServiceProxy(userService);
+        UserService service = new UserServiceImpl();
+        UserServiceProxyByJdk userServiceProxyByJdk = new UserServiceProxyByJdk(service);
+        UserService userServiceProxy = (UserService) userServiceProxyByJdk.getProxy();
         userServiceProxy.sayHello();
     }
 }
