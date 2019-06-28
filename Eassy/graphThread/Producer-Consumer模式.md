@@ -7,7 +7,7 @@
 - 在Future模式中, 传递返回值的时候, 可以使用Producer-Consumer.
 - Worker-Thread模式中, 对于Worker的请求可以使用Producer-Consumer模式对请求进行控制.
 #### 代码示例:
->下面是一个例子, 由MakerThread生产字符串, Table进行保存, 然后ConsumerThread进行消费(打印出来).
+>由MakerThread生产字符串, Table进行保存, 然后ConsumerThread进行消费(打印出来).
 ```java
 package com.graphic.producerAndConsumer;
 
