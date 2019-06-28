@@ -13,7 +13,7 @@
 - 将请求发送给线程池的缓冲区可以使用Producer-Consumer模式.
 
 #### 代码示例:
->示例说明:Channel是请求发送的"管道", Request代表了每个请求, 然后WorkerThread中执行请求的方法.ClientThread模拟了客户端请求的发送.
+>Channel是请求发送的"管道", Request代表了每个请求, 然后WorkerThread中执行请求的方法.ClientThread模拟了客户端请求的发送.
 
 ```java
 package com.graphic.workerThread;
