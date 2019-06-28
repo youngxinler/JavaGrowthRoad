@@ -6,7 +6,7 @@
 - 想要节省开启线程所花费的时间, 可以使用Worker-Thread模式.
 - 当需要返回结果的时候, 可以使用future模式.
 #### 代码示例:
->示例介绍:Host接收请求, 然后开启新的线程进行任务的处理, (字符串输出, 为了模拟正常情况下, 进行Thread.sleep()阻塞).
+>Host接收请求, 然后开启新的线程进行任务的处理, (字符串输出, 为了模拟正常情况下, 进行Thread.sleep()阻塞).
 
 ```java
 package com.graphic.threadPerMessage;
