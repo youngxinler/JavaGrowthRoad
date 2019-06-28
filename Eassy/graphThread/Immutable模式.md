@@ -1,6 +1,3 @@
----
-title: Immutable模式
----
 #### 适用的情况
 多个线程之间共享对象, 但是该对象的状态不会发生变化
 用于提高[Single Thread Exception](https://www.jianshu.com/p/0ed7102c01f3)模式的吞吐量
