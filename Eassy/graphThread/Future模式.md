@@ -7,7 +7,7 @@
 - 要在向Thread-Per-Message模式中想要获取处理结果的时候可以使用Future模式.
 - 同上, 要想在Worker-Thread模式中获取处理结果也可以使用Future模式.
 #### 代码示例:
-> 示例简介:FutureData是其中的"Future"类的实现, 里面的RealData字段装载着真实要返回的数据, ready则是RealData是否准备完毕的状态flag.
+>FutureData是其中的"Future"类的实现, 里面的RealData字段装载着真实要返回的数据, ready则是RealData是否准备完毕的状态flag.
 
 ```java
 package com.graphic.future;
