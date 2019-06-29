@@ -1,6 +1,3 @@
----
-title: Guarded Suspension 模式
----
 #### 适用的情况
 相比于Single Thread Exception模式, 本模式加入了加入了守护条件来确保共享实例在被线程访问前是正确的状态
 #### 实现的方式

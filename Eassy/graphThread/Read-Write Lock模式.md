@@ -6,7 +6,7 @@
 - ReadWriteLock进行互斥的部分使用的是Guarded Suspension模式.
 - 当实例是不可变的情况下, 可以使用Immutable模式.
 #### 代码示例:
->示例介绍:ReaderThread负责读取Data实例中的字符串, WriterThread每个一段时间向Data写入字符串, 
+>ReaderThread负责读取Data实例中的字符串, WriterThread每个一段时间向Data写入字符串, 
 >ReadWriteLock注入Data中, 对Data的读取和写入方法加入了锁.
 
 >Notice: 使用finally确保方法即使出现异常, 最后也能关闭掉锁, 以防止出现死锁.
