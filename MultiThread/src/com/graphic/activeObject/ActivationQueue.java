@@ -1,8 +1,11 @@
 package com.graphic.activeObject;
 
+/**
+ * @author youngxinler  19-6-29 上午11:28
+ **/
+
 public class ActivationQueue {
     private static final int MAX_METHOD_REQUEST = 100;
-
     private final MethodRequest[] requestQueue;
     private int tail;
     private int head;

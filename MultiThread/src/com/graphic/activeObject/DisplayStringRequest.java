@@ -1,7 +1,10 @@
 package com.graphic.activeObject;
 
-public class DisplayStringRequest extends MethodRequest<String> {
+/**
+ * @author youngxinler  19-6-29 上午11:17
+ **/
 
+public class DisplayStringRequest extends MethodRequest<Object> {
     private final String string;
 
     public DisplayStringRequest(Servant servant, String string) {

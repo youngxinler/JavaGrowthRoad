@@ -19,11 +19,7 @@ public class Main {
 
             System.out.println("main : join");
             countUpThread.join();
-            System.out.println("main check counterThread isInterrupt" + countUpThread.isShutdownRequested());
-            while (!countUpThread.isShutdownRequested()) {
-                Thread.sleep(1000);
-                System.out.println("no interrupt");
-            }
+            System.out.println("main check counterThread isShutdownRequested " + countUpThread.isShutdownRequested());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

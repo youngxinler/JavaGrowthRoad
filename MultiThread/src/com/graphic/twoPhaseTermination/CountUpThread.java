@@ -32,7 +32,7 @@ public class CountUpThread extends Thread {
             }
         } catch (InterruptedException e) {
             System.out.println("i get the interruptedException");
-            System.out.println("self check counterThread isInterrupt" + Thread.currentThread().isInterrupted());
+            System.out.println("self check counterThread isInterrupt " + isInterrupted());
             interrupt();
         } finally {
             doShutdown();

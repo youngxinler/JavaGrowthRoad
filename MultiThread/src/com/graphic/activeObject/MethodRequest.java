@@ -1,12 +1,16 @@
 package com.graphic.activeObject;
 
-public abstract class MethodRequest<T> {
-    protected final Servant servant;
-    protected final FutureResult<T> futureResult;
+/**
+ * @author youngxinler  19-6-29 上午11:18
+ **/
 
-    protected MethodRequest(Servant servant, FutureResult<T> futureResult) {
+abstract class MethodRequest<T> {
+    protected final Servant servant;
+    protected final FutureResult<T> future;
+
+    protected MethodRequest(Servant servant, FutureResult<T> future) {
+        this.future = future;
         this.servant = servant;
-        this.futureResult = futureResult;
     }
 
     public abstract void execute();

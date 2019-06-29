@@ -1,5 +1,9 @@
 package com.graphic.activeObject;
 
+/**
+ * @author youngxinler  19-6-29 上午11:12
+ **/
+
 public class Servant implements ActiveObject {
     @Override
     public Result<String> makeString(int count, char fillChar) {
@@ -18,7 +22,7 @@ public class Servant implements ActiveObject {
     @Override
     public void displayString(String string) {
         try {
-            System.out.println("displayString   " + string);
+            System.out.println("displayString" + string);
             Thread.sleep(10);
         } catch (InterruptedException e) {
             e.printStackTrace();

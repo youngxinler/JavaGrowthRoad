@@ -1,10 +1,14 @@
 package com.graphic.activeObject;
 
+/**
+ * @author youngxinler  19-6-29 下午12:00
+ **/
+
 public class DisplayClientThread extends Thread {
     private final ActiveObject activeObject;
 
-    public DisplayClientThread(String name, ActiveObject activeObject) {
-        super(name);
+    public DisplayClientThread(String s, ActiveObject activeObject) {
+        super(s);
         this.activeObject = activeObject;
     }
 
@@ -12,12 +16,12 @@ public class DisplayClientThread extends Thread {
     public void run() {
         try {
             for (int i = 0; true; i++) {
-                String s = Thread.currentThread().getName() + " " + i;
-                activeObject.displayString(s);
+                String string = Thread.currentThread().getName() + " " + i;
+                activeObject.displayString(string);
                 Thread.sleep(200);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+
         }
     }
 }

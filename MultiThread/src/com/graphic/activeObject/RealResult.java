@@ -1,5 +1,8 @@
 package com.graphic.activeObject;
 
+/**
+ * @author youngxinler  19-6-29 上午11:09
+ **/
 
 public class RealResult<T> extends Result<T> {
     private final T resultValue;
@@ -7,6 +10,7 @@ public class RealResult<T> extends Result<T> {
     public RealResult(T resultValue) {
         this.resultValue = resultValue;
     }
+
 
     @Override
     public T getResultValue() {
