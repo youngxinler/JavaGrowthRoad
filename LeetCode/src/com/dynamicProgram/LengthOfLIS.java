@@ -38,7 +38,7 @@ public class LengthOfLIS {
         return allMax;
     }
 
-    public int lengthOfLIS(int[] nums) {
+    public int lengthOfLIS_2(int[] nums) {
         int len = nums.length;
         if (len < 2) {
             return len;
@@ -76,4 +76,34 @@ public class LengthOfLIS {
         return end + 1;
     }
 
+    public int lengthOfLIS(int[] nums) {
+        int len = nums.length;
+        if (len < 2) {
+            return len;
+        }
+        int[] tail = new int[len];
+        int end = 0;
+        tail[0] = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] > tail[end]) {
+                end++;
+                nums[end] = nums[i];
+            } else {
+                int right = end;
+                int left = 0;
+                int target = nums[i];
+                while (left < right) {
+                    int mid = (left + right) / 2;
+                    if (nums[mid] < target) {
+                        left = mid + 1;
+                    } else {
+                        assert nums[mid] >= target;
+                        right = mid;
+                    }
+                }
+                tail[right] = target;
+            }
+        }
+        return end + 1;
+    }
 }
