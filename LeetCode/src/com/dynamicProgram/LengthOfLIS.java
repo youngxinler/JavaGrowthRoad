@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class LengthOfLIS {
 
     public static void main(String[] args) {
-        int[] nums = new int[]{10, 9, 2, 5, 3, 7, 101, 18};
+        int[] nums = new int[]{10, 9, 2, 5, 3, 4};
         LengthOfLIS lengthOfLIS = new LengthOfLIS();
         int ans = lengthOfLIS.lengthOfLIS(nums);
         System.out.println(ans);
@@ -76,6 +76,8 @@ public class LengthOfLIS {
         return end + 1;
     }
 
+
+    //[10,9,2,5,3,4]
     public int lengthOfLIS(int[] nums) {
         int len = nums.length;
         if (len < 2) {
@@ -87,17 +89,17 @@ public class LengthOfLIS {
         for (int i = 1; i < nums.length; i++) {
             if (nums[i] > tail[end]) {
                 end++;
-                nums[end] = nums[i];
+                tail[end] = nums[i];
             } else {
                 int right = end;
                 int left = 0;
                 int target = nums[i];
                 while (left < right) {
                     int mid = (left + right) / 2;
-                    if (nums[mid] < target) {
+                    if (tail[mid] < target) {
                         left = mid + 1;
                     } else {
-                        assert nums[mid] >= target;
+                        assert tail[mid] >= target;
                         right = mid;
                     }
                 }
