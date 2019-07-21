@@ -27,7 +27,7 @@
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
-            <scope>provided</scope>
+            <version>3.2.12</version>
         </dependency>
     </dependencies>
 
