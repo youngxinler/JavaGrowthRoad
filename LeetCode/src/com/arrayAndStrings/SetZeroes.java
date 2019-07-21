@@ -1,49 +1,39 @@
 package com.arrayAndStrings;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * @author youngxinler  19-6-1 下午1:51
- * @version 0.1
+ * @author youngxinler  2019/7/21
  **/
-
-
-//矩阵置零
 public class SetZeroes {
-    public void setZeroes(int[][] matrix) {
-        Boolean isCol = false;
-        int R = matrix.length;
-        int C = matrix[0].length;
-
-        for (int i = 0; i < R; i++) {
-
-            if (matrix[i][0] == 0) {
-                isCol = true;
-            }
-            for (int j = 1; j < C; j++) {
-                if (matrix[i][j] == 0) {
-                    matrix[0][j] = 0;
-                    matrix[i][0] = 0;
+    public void setZeroes(int[][] matrix){
+        Set<Integer> row = new HashSet<>();
+        int lrow = matrix.length;
+        int lcol = matrix[0].length;
+        for (int i = 0; i < lcol; i++) {
+            for (int j = 0; j < lrow; j++) {
+                if (matrix[j][i] == 0){
+                    int psj = j;
+                    while (psj >= 0){
+                        matrix[psj--][i] = 0;
+                    }
+                    row.add(j);
+                    while (j + 1 < lrow){
+                        j = j + 1;
+                        if (matrix[j][i] == 0){
+                            row.add(j);
+                        }else {
+                            matrix[j][i] = 0;
+                        }
+                    }
                 }
             }
         }
-
-        for (int i = 1; i < R; i++) {
-            for (int j = 1; j < C; j++) {
-                if (matrix[i][0] == 0 || matrix[0][j] == 0) {
-                    matrix[i][j] = 0;
-                }
-            }
-        }
-
-        if (matrix[0][0] == 0) {
-            for (int j = 0; j < C; j++) {
-                matrix[0][j] = 0;
-            }
-        }
-
-        if (isCol) {
-            for (int i = 0; i < R; i++) {
-                matrix[i][0] = 0;
-            }
+        for (int num :
+                new ArrayList<Integer>(row)) {
+            matrix[num] = new int[lcol];
         }
     }
 }
