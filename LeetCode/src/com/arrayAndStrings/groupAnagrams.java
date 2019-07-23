@@ -9,8 +9,7 @@ import java.util.*;
 
 public class groupAnagrams {
     public List<List<String>> groupAnagrams(String[] strs) {
-        final Map<String, List<String>> map = new HashMap<>();
-        final List<List<String>> res = new ArrayList<>();
+        Map<String, List<String>> map = new HashMap<>();
         for (String str :
                 strs) {
             String sortedString = sort(str);
@@ -22,11 +21,7 @@ public class groupAnagrams {
                 map.put(sortedString, rows);
             }
         }
-        for (Map.Entry<String, List<String>> entry :
-                map.entrySet()) {
-            res.add(entry.getValue());
-        }
-        return res;
+        return new ArrayList<>(map.values());
     }
 
     private String sort(String str) {
