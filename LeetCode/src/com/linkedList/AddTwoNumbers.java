@@ -1,12 +1,14 @@
 package com.linkedList;
 
+import javax.swing.*;
+
 /**
  * @author youngxinler  19-6-1 下午7:11
  * @version 0.1
  **/
 
 public class AddTwoNumbers {
-    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+    public ListNode addTwoNumbers_1(ListNode l1, ListNode l2) {
 
         //链表大部分问题都需要记录head
         ListNode res = new ListNode(0);
@@ -40,5 +42,51 @@ public class AddTwoNumbers {
             res.next = new ListNode(last);
         }
         return head.next.next;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2){
+        ListNode head = new ListNode(-1);
+        ListNode res = new ListNode(-1);
+        res.next = head;
+        int last = 0;
+        while (l1 != null || l2 != null){
+            int a = 0, b = 0;
+            if (l1 != null){
+                a = l1.val;
+                l1 = l1.next;
+            }
+            if (l2 != null){
+                b = l2.val;
+                l2 = l2.next;
+            }
+            if (a + b + last > 9){
+                head.next = new ListNode(a + b - last);
+                last = 1;
+            }else {
+                head.next = new ListNode(a + b + last);
+                last = 0;
+            }
+            head = head.next;
+        }
+        if (last != 0) head.next = new ListNode(last);
+        return res.next.next;
     }
 }

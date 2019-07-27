@@ -8,14 +8,10 @@ package com.linkedList;
 public class OddEvenList {
     public ListNode oddEvenList(ListNode head) {
         if (head == null || head.next == null) return head;
-        //奇节点头结点
         ListNode o = head;
-        //偶节点头结点
         ListNode p = head.next;
-        //
         ListNode e = p;
-
-        while (o.next != null && e.next != null) {
+        while (o.next != null && e.next != null){
             o.next = e.next;
             o = o.next;
             e.next = o.next;
@@ -24,4 +20,5 @@ public class OddEvenList {
         o.next = p;
         return head;
     }
+
 }
