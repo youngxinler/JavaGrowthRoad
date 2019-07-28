@@ -1,5 +1,8 @@
 package com.linkedList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author youngxinler  19-6-2 下午7:37
  * @version 0.1
@@ -20,5 +23,6 @@ public class OddEvenList {
         o.next = p;
         return head;
     }
+
 
 }
