@@ -1,19 +1,39 @@
 package com.treesAndGraphs;
 
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class InorderTraversal {
-    public List<Integer> inorderTraversal(TreeNode root) {
-        List<Integer> res = new ArrayList<>();
-        traver(res, root);
-        return res;
+    //递归
+    public List<Integer> inorderTraversal_1(TreeNode root){
+        List<Integer> list = new ArrayList<>();
+        if (root == null) return list;
+        fun(list, root);
+        return list;
     }
 
-    private void traver(final List<Integer> list, TreeNode root) {
-        if (root == null) return;
-        if (root.left != null) traver(list, root.left);
-        list.add(root.val);
-        if (root.right != null) traver(list, root.right);
+    private void fun(List<Integer> list, TreeNode t){
+        if (t == null) return;
+        if (t.left != null) fun(list, t.left);
+        list.add(t.val);
+        if (t.right != null) fun(list, t.right);
+    }
+
+    //迭代
+    public List<Integer> inorderTraversal(TreeNode root){
+        List<Integer> list = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        while (root != null || stack.empty()){
+            while (root != null){
+                stack.add(root);
+                root = root.left;
+            }
+            root = stack.pop();
+            list.add(root.val);
+            root = root.right;
+        }
+        return list;
     }
 }
