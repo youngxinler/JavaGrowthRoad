@@ -1,6 +1,7 @@
 package com.treesAndGraphs;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ZigzagLevelOrder {
     //节点入栈方向变化
@@ -73,31 +74,30 @@ public class ZigzagLevelOrder {
         return res;
     }
 
-
-    //好愚蠢, 竟然没想BFS
-
-    private List<List<Integer>> res = new ArrayList<>();
-
-    //BFS
-    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
-        dfs(root, 0);
-        for (int i = 0; i < res.size(); i++) {
-            if (i % 2 != 0) {
-                Collections.reverse(res.get(i));
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root){
+        List<List<Integer>> ans = new ArrayList<>();
+        if (root == null) return ans;
+        ans.add(new ArrayList<>());
+        bfs(ans, root, 0);
+        for (int i = 0; i < ans.size(); i++) {
+            if (i % 2 == 1){
+                Collections.reverse(ans.get(i));
             }
         }
-        return res;
+        return ans;
     }
 
-    private void dfs(TreeNode root, int level) {
+    private void bfs(List<List<Integer>> ans, TreeNode root, int floor){
         if (root == null) return;
-        if (res.size() < level + 1) {
-            List<Integer> cur = new ArrayList<>();
-            res.add(cur);
+        if (floor + 1 <= ans.size()){
+            ans.get(floor).add(root.val);
+        }else {
+            List<Integer> node = new ArrayList<>();
+            node.add(root.val);
+            ans.add(node);
         }
-        res.get(level).add(root.val);
-        if (root.left != null) dfs(root.left, level + 1);
-        if (root.right != null) dfs(root.right, level + 1);
+        bfs(ans, root.left, floor + 1);
+        bfs(ans, root.right, floor + 1);
     }
 }
 
