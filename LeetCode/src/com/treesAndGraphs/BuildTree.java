@@ -1,38 +1,39 @@
 package com.treesAndGraphs;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class BuildTree {
+
+
     int preIndex = 0;
     int[] preOrder;
     int[] inOrder;
 
-    HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>();
+    Map<Integer, Integer> map = new HashMap<>();
 
-    public TreeNode buildTree(int[] preOrder, int[] inOrder) {
+    public TreeNode buildTree(int[] preOrder, int[] inOrder){
         this.preOrder = preOrder;
         this.inOrder = inOrder;
         int index = 0;
         for (int n :
                 inOrder) {
-            hashMap.put(n, index++);
+            map.put(n, index++);
         }
-        return helper(0, inOrder.length);
+        return fun(0, preOrder.length);
     }
 
-    private TreeNode helper(int left, int right) {
-        //root has no left tree or right tree
-        if (left == right) return null;
-        int rootVal = preOrder[preIndex];
-        TreeNode root = new TreeNode(rootVal);
-        //find root's  index in inOrder
-        int in = hashMap.get(rootVal);
+    private TreeNode fun(int left, int right){
+        if (right == left) return null;
+        int val = preOrder[preIndex];
+        TreeNode root = new TreeNode(val);
+        int in = map.get(val);
 
-        //root right move
         preIndex++;
-        root.left = helper(left, in);
-        root.right = helper(in + 1, right);
+        root.left = fun(left, in);
+        root.right = fun(in + 1, right);
         return root;
     }
 }
+
 
