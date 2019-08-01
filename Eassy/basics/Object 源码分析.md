@@ -1,6 +1,3 @@
----
-title: Object 源码分析
----
 ```java
 package java.lang;
 
@@ -100,7 +97,7 @@ It is not required that if two objects are unequal according to the equals(java.
 > -  如果两个对象equals()方法不相等, 那么返回的hashcode不一定是不相等的. (有可能相等, 有可能不等.)
 
 *如果equals()不相等, hashcode也不相等, 那么是否可以提升相关哈希容器的性能? ---疑惑*
-也就是说, 不能根据hashcode去判断两个对象是否相等, 但是可以推断如果两个对象equals()为true, 那么他们的hashcode相等.
+可以在判断"复杂对象之前"先调用hashcode()之前进行比较, 如果不相等, 那么可以确定这两个对象不相等, 提前返回(&& fast fail), 如果通过再进行equals()方法比较.
 
 ##### `public boolean equals(Object obj)`
 返回两个对象是否相等.
