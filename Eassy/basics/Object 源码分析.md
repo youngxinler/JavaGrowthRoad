@@ -1,6 +1,3 @@
----
-title: Object 源码分析
----
 ```java
 package java.lang;
 
@@ -100,7 +97,7 @@ It is not required that if two objects are unequal according to the equals(java.
 > -  如果两个对象equals()方法不相等, 那么返回的hashcode不一定是不相等的. (有可能相等, 有可能不等.)
 
 *如果equals()不相等, hashcode也不相等, 那么是否可以提升相关哈希容器的性能? ---疑惑*
-也就是说, 不能根据hashcode去判断两个对象是否相等, 但是可以推断如果两个对象equals()为true, 那么他们的hashcode相等.
+可以在判断"复杂对象之前"先调用hashcode()之前进行比较, 如果不相等, 那么可以确定这两个对象不相等, 提前返回(&& fast fail), 如果通过再进行equals()方法比较.
 
 ##### `public boolean equals(Object obj)`
 返回两个对象是否相等.
@@ -128,3 +125,25 @@ Object默认返回的是class的name(全名)和hashcode的十六进制形式
 ```
 **![输出结果](https://i.loli.net/2019/07/28/5d3d1aa46395514011.jpg)**
 
+##### `public final native void notify()`
+唤醒一个等待该实例监视器(内置锁)的线程.
+该方法必须由持有内置锁的线程进行 调用否则会抛出IllegalMonitorStateException
+##### `public final native void notifyAll()`
+唤醒所有正在等待实例监视器(内置锁)的线程.
+调用线程必须和notify()的调用线程一致, 是持有内置锁的线程进行调用.
+
+>`notify()`和`notifyAll()`方法的调用要根据情况, `notifyAll()`会将所有线程唤醒, 所有唤醒的线程将争夺锁, 这将造成性能的下降, 但是大部分的时候如果你并不是很清楚锁所维护的条件的时候, 那就使用`notifyAll()`吧, 这也是大部分的人的选择, 因为这不会造成死锁. 但是如果你对性能有严格的要求,认为`notifyAll()`不满足, 而`notify()`也不适合, 那么就用concurrent的显示锁吧.
+
+##### `public final native void wait(long timeout) throws InterruptedException`
+当前线程进入该实例内置锁的等待队列, 直接其他线程调用`notify()`或者`notifyAll()`, 或者超过了指定的等待时间.
+当前线程必须持有内置锁才能调用`wait()`.
+如果该线程被其他线程调用了`interrupted()`, 一个`InterruptedException`将会"准备"抛出, *只有当该线程持有内置锁的时候, 才会抛出*.
+
+##### `public final void wait(long timeout, int nanos) throws InterruptedException`
+`wait()`方法的重载版本.
+
+##### `public final void wait() throws InterruptedException`
+`wait()`方法的重载版本.
+
+##### `protected void finalize() throws Throwable { }`
+当jvm确定可以回收该对象之后, 会调用该方法.
