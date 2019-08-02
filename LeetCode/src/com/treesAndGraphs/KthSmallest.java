@@ -1,26 +1,26 @@
 package com.treesAndGraphs;
 
 public class KthSmallest {
+    private int ans;
+    private int target;
+    private int n;
 
-    //dfs 中序遍历, 返回第k个元素
-    private int res = 0;
-    private int target = 1;
-    private int n = 0;
-
-    private int kthSmallest(TreeNode root, int k) {
-        target = k;
+    public int kthSmallest(TreeNode root, int k){
+        this.target = k;
+        n = 0;
         visit(root);
-        return res;
+        return ans;
     }
 
-    private void visit(TreeNode root) {
-        if (root == null) return;
+    private void visit(TreeNode root){
+        if (root == null)return;
         visit(root.left);
         n++;
-        if (n == target) {
-            res = root.val;
+        if (n == target){
+            ans = root.val;
             return;
         }
         visit(root.right);
     }
+
 }

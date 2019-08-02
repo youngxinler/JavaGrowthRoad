@@ -3,6 +3,8 @@ package com.others;
 /**
  * @author youngxinler  2019/8/1
  **/
+
+//并查集1
 public class FindRedundantConnection {
     int[] p;
     public int[] findRedundantConnection(int[][] edges){

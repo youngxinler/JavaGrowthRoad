@@ -6,14 +6,15 @@ package com.treesAndGraphs;
  **/
 
 public class Connect {
-    public Node connect(Node root) {
+    //有点像bfs
+    public Node connect(Node root){
         if (root == null) return null;
         Node cur = root;
-        while (cur != null) {
-            if (cur.left != null) {
+        while (cur != null){
+            if(cur.left != null){
                 cur.left.next = cur.right;
             }
-            if (cur.right != null && cur.next != null) {
+            if (cur.next != null && cur.right != null){
                 cur.right.next = cur.next.left;
             }
             cur = cur.next;
