@@ -31,6 +31,7 @@ public class AtomicInteger extends Number implements java.io.Serializable {
 这里通过this传入了实例的引用, 与偏移量配合, 完成这个CAS操作.
 至于具体的unsafe的代码, 这里的compareAndSwapInt()是一个JNI方法, 我在其他文章说过.
 
+### 其他原子变量
 至于其他原子变量的更新操作, 和AtomicInteger的处理思路是近乎一致的, 通过Unsafe直接或者间接提供的CAS操作来完成
 AtomicReference的一个举例
 ```java
@@ -42,4 +43,4 @@ AtomicReference的一个举例
     }
 ```
 这里不免有一个疑问, 可能会觉得有了set(), 还要compareAndSet()方法有什么用呢?
-*我的理解是:set()方法是无状态的, 由于 v本身就是volitile, 保证了每次更新的可见性, 但是仅仅拥有可见性是不行的, 想一下, 其实跟volitile i进行i++会造成错误一样, 如果你的逻辑操作是有状态依赖的话, 就要用compareAndSet(), 如果没有状态依赖, 那么直接set()即可*
+*我的理解是:set()方法是无状态的, 由于 value本身就是volitile, 保证了每次更新的可见性, 但是仅仅拥有可见性是不行的, 想一下, 其实跟volitile i进行i++会造成错误一样, 如果你的逻辑操作是有状态依赖的话, 就要用compareAndSet(), 如果没有状态依赖, 那么直接set()即可*
