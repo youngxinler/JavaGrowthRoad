@@ -1,37 +1,29 @@
 package com.treesAndGraphs;
 
 public class NumIslands {
-    public int numIslands(char[][] grid) {
-        if (grid == null || grid.length < 1 || grid[0].length < 1) {
-            return 0;
-        }
-        int res = 0;
+    public int numIslands(char[][] grid){
+        int count = 0;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[0].length; j++) {
-                if (grid[i][j] == '1' && bfs(i, j, grid)) {
-                    res++;
+                if (grid[i][j] == '1'){
+                    count++;
+                    bfs(grid, i, j);
                 }
             }
         }
-        return res;
+        return count;
     }
 
-    private boolean bfs(int line, int col, char[][] grid) {
-        if (inMap(line, col, grid) && grid[line][col] == '1') {
-            grid[line][col] = '2';
-            bfs(line - 1, col, grid);
-            bfs(line + 1, col, grid);
-            bfs(line, col - 1, grid);
-            bfs(line, col + 1, grid);
-            return true;
+    private void bfs(char[][] grid, int row, int col){
+        if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length){
+            return;
         }
-        return false;
-    }
-
-    private boolean inMap(int line, int col, char[][] grid) {
-        if (line > grid.length - 1 || line < 0 || col < 0 || col > grid.length - 1) {
-            return false;
+        if (grid[row][col] == '1'){
+            grid[row][col] = '2';
+            bfs(grid, row - 1, col);
+            bfs(grid, row + 1, col);
+            bfs(grid, row, col + 1);
+            bfs(grid, row, col - 1);
         }
-        return true;
     }
 }
