@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class LetterCombinations {
 
+
     private final Map<String, String> map = new HashMap<String, String>(9) {{
         put("2", "abc");
         put("3", "def");
@@ -18,25 +19,28 @@ public class LetterCombinations {
         put("9", "wxyz");
     }};
 
-    private final List<String> res = new ArrayList<>(500);
+    private int len;
 
-    public List<String> letterCombinations(String digits) {
-        if (digits.length() != 0) {
-            backTrack("", digits);
+    public List<String> letterCombinations(String digits){
+        List<String> ans = new ArrayList<>();
+        this.len = digits.length();
+        if (digits.length() != 0){
+            backTrace(ans, "", digits);
+            return ans;
+        }else {
+            return ans;
         }
-        return res;
     }
 
-    private void backTrack(String combinations, String cur) {
-        if (cur.length() != 0) {
-            String now = cur.substring(0, 1);
-            String letters = map.get(now);
-            for (int i = 0; i < letters.length(); i++) {
-                String letter = letters.substring(i, i + 1);
-                backTrack(combinations + letter, cur.substring(1));
+    private void backTrace(List<String> res, String cm, String digits){
+        if (cm.length() != len){
+            String one = digits.substring(0, 1);
+            String cs = map.get(one);
+            for (int i = 0; i < cs.length(); i++) {
+                backTrace(res, cm + cs.charAt(i), digits.substring(1));
             }
-        } else {
-            res.add(combinations);
+        }else {
+            res.add(cm);
         }
     }
 }
