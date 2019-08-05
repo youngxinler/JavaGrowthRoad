@@ -7,27 +7,24 @@ import java.util.List;
  * @author youngxinler  2019/6/13 10:58
  **/
 public class Permute {
-
-
-    public List<List<Integer>> permute(int[] nums) {
+    public List<List<Integer>> permute(int[] nums){
         List<List<Integer>> res = new ArrayList<>();
-        backTrack(res, new ArrayList<>(), nums);
+        backTrack(res, nums, new ArrayList<>(), nums.length);
         return res;
     }
 
-    //回溯解决! 注意字段引用的对象!!!
-    private void backTrack(List<List<Integer>> res, List<Integer> cur, int[] nums) {
-        if (cur.size() == nums.length) {
+    private void backTrack(List<List<Integer>> res, int[] nums, List<Integer> cur, int n){
+        int len = cur.size();
+        if (len == n){
             res.add(cur);
             return;
         }
-        List<Integer> now;
-        for (int i = 0; i < nums.length; i++) {
-            if (!cur.contains(nums[i])) {
-                now = new ArrayList<>(cur);
-                now.add(nums[i]);
-                backTrack(res, now, nums);
-            }
+        for (int num:
+             nums) {
+            if (cur.indexOf(num) != -1) continue;
+            List<Integer> next = new ArrayList<>(cur);
+            next.add(num);
+            backTrack(res, nums, next, n);
         }
     }
 }

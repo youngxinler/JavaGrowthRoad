@@ -11,24 +11,23 @@ import java.util.List;
 public class GenerateParenthesis {
 
 
-    public List<String> generateParenthesis(int n) {
+    public List<String> generateParenthesis(int n){
         List<String> res = new ArrayList<>();
-        backTrack(res, "", 0, 0, n);
+        backTrace(res, "", 0, 0, n);
         return res;
     }
 
-    //回溯算法
-    private void backTrack(List<String> ans, String cur, int open, int close, int n) {
-        if (cur.length() == n * 2) {
-            ans.add(cur);
+    private void backTrace(List<String> res, String cur, int open, int close, int n){
+        int len = cur.length();
+        if (len == n * 2){
+            res.add(cur);
             return;
         }
-
-        if (open < n) {
-            backTrack(ans, cur + "(", open + 1, close, n);
+        if (open < n){
+            backTrace(res, cur + "(", open + 1, close, n);
         }
-        if (close < open) {
-            backTrack(ans, cur + ")", open, close + 1, n);
+        if (close < open){
+            backTrace(res, cur + ")", open, close + 1, n);
         }
     }
 }
