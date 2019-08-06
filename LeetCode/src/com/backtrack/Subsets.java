@@ -26,16 +26,15 @@ public class Subsets {
         return res;
     }
 
-    //递归枚举
-    public List<List<Integer>> subsets_2(int[] nums) {
+    public List<List<Integer>> subsets(int[] nums){
         List<List<Integer>> res = new ArrayList<>();
-        res.add(new ArrayList<Integer>());
-        recursion(nums, 0, res);
+        res.add(new ArrayList<>());
+        backTrack(nums, res, 0);
         return res;
     }
 
-    private void recursion(int[] nums, int i, List<List<Integer>> res) {
-        if (i >= nums.length) {
+    private void backTrack(int[] nums, List<List<Integer>> res, int i){
+        if (i >= nums.length){
             return;
         }
         int size = res.size();
@@ -44,6 +43,6 @@ public class Subsets {
             cur.add(nums[i]);
             res.add(cur);
         }
-        recursion(nums, i + 1, res);
+        backTrack(nums, res, i + 1);
     }
 }
