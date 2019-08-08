@@ -6,12 +6,12 @@ package com.sortAndSearch;
  **/
 
 public class SortColors {
+
+    //类似计数排序
     public void sortColors(int[] nums) {
         int zeros = 0;
         int ones = 0;
-        /*
-            记录0 和 1的个数, 最后更改数组
-         */
+
         for (int num :
                 nums) {
             if (num == 0) {
@@ -20,12 +20,15 @@ public class SortColors {
                 ones++;
             }
         }
+
         for (int i = 0; i < zeros; i++) {
             nums[i] = 0;
         }
-        for (int i = zeros; i < ones; i++) {
+
+        for (int i = zeros; i < ones + zeros; i++) {
             nums[i] = 1;
         }
+
         for (int i = zeros + ones; i < nums.length; i++) {
             nums[i] = 2;
         }
