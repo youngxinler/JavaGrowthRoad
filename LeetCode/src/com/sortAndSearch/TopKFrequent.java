@@ -8,31 +8,33 @@ import java.util.*;
  **/
 
 public class TopKFrequent {
-    public List<Integer> topKFrequent(int[] nums, int k) {
-        HashMap<Integer, Integer> hashMap = new HashMap<>();
+    public List<Integer> topKFrequent(int[] nums, int k){
+        Map<Integer, Integer> map = new HashMap<>();
         for (int num :
                 nums) {
-            hashMap.put(num, hashMap.getOrDefault(num, 0) + 1);
+            map.put(num, map.getOrDefault(num, 0) + 1);
         }
-        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(new Comparator<Integer>() {
+        PriorityQueue<Integer> queue = new PriorityQueue<>(new Comparator<Integer>() {
             @Override
-            public int compare(Integer integer, Integer t1) {
-                return hashMap.get(integer) - hashMap.get(t1);
+            public int compare(Integer o1, Integer o2) {
+                return map.get(o1) - map.get(o2);
             }
         });
-        for (int key : hashMap.keySet()) {
-            if (priorityQueue.size() < k) {
-                priorityQueue.add(key);
-            } else if (hashMap.get(key) > hashMap.get(priorityQueue.peek())) {
-                priorityQueue.remove();
-                priorityQueue.add(key);
+        for (int key :
+                map.keySet()) {
+            if (queue.size() < k) {
+                queue.add(key);
+            } else if (map.get(key) > map.get(queue.peek())) {
+                queue.remove();
+                queue.add(key);
             }
         }
-        List<Integer> res = new ArrayList<>();
-        while (!priorityQueue.isEmpty()) {
-            res.add(priorityQueue.remove());
+        List<Integer> ans = new ArrayList<>(queue.size());
+        for (int num :
+                queue.toArray(new Integer[queue.size()])) {
+            ans.add(num);
         }
-        Collections.reverse(res);
-        return res;
+        Collections.reverse(ans);
+        return ans;
     }
 }
