@@ -39,18 +39,18 @@ public class FindKthLargest {
 
     //最小堆
     public int findKthLargest_3(int[] nums, int k) {
-        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(k);
+        PriorityQueue<Integer> queue = new PriorityQueue<>();
         for (int i = 0; i < nums.length; i++) {
-            if (i < k) {
-                priorityQueue.add(nums[i]);
+            if (queue.size() < k){
+                queue.add(nums[i]);
                 continue;
             }
-            if (priorityQueue.peek() < nums[i]) {
-                priorityQueue.poll();
-                priorityQueue.add(nums[i]);
+            if (queue.peek() < nums[i]){
+                queue.poll();
+                queue.add(nums[i]);
             }
         }
-        return priorityQueue.peek();
+        return queue.peek();
     }
 
     //巧用快排
