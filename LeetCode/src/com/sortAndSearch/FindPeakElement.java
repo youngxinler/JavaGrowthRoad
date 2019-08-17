@@ -19,8 +19,6 @@ public class FindPeakElement {
             if (nums[i] > nums[i - 1]) {
                 if (nums[i] > nums[i + 1]) {
                     return i;
-                } else {
-                    continue;
                 }
             }
         }
@@ -28,13 +26,17 @@ public class FindPeakElement {
     }
 
     //二分查找
-    public int findPeakElement(int[] nums) {
+    //num[i] != num[i + 1] 该题使用二分的关键
+    //num[i] != num[i + 1] 使得3个位一组.
+    public int findPeakElement(int[] nums){
         int left = 0, right = nums.length - 1;
-        while (left < right) {
+        while (left < right){
             int mid = left + (right - left) / 2;
-            if (nums[mid] > nums[mid + 1]) {
+            if (nums[mid] > nums[mid + 1]){
+                //right指向较大
                 right = mid;
-            } else {
+            }else {
+                //更新left, 使指向最终的答案
                 left = mid + 1;
             }
         }
