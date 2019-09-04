@@ -49,7 +49,7 @@ public class Search {
             if (nums[mid] > nums[mid + 1]) {
                 return mid + 1;
             } else {
-                if (nums[mid] > nums[l]) {
+                if (nums[mid] >= nums[l]) {
                     l = mid + 1;
                 } else {
                     r = mid - 1;
