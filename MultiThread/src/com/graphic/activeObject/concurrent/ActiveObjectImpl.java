@@ -22,7 +22,7 @@ public class ActiveObjectImpl implements ActiveObject {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-
+                        e.printStackTrace();
                     }
                 }
                 return new String(buffer);
@@ -40,7 +40,7 @@ public class ActiveObjectImpl implements ActiveObject {
                     System.out.println("display: " + string);
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-
+                    e.printStackTrace();
                 }
             }
         }
