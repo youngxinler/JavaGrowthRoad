@@ -36,16 +36,15 @@ public class SearchMatrix {
     }
 
 
-    //从末尾开始判断, 根据大小进行"下沉" 避免了后续的"垃圾"比较.
-    public boolean searchMatrix(int[][] matrix, int target) {
+    public boolean searchMatrix(int[][] matrix, int target){
         if (matrix.length == 0) return false;
         int row = 0, col = matrix[0].length - 1;
-        while (row < matrix.length && col >= 0) {
-            if (target < matrix[row][col]) {
+        while (row < matrix.length && col >= 0){
+            if (matrix[row][col] > target){
                 col--;
-            } else if (target > matrix[row][col]) {
+            }else if (matrix[row][col] < target){
                 row++;
-            } else {
+            }else {
                 return true;
             }
         }

@@ -29,9 +29,9 @@ public class MajorityElement {
     public int majorityElement(int[] nums) {
         int ans = nums[0];
         int times = 1;
-        for (int i = 0; i < nums.length; i++) {
+        for (int i = 1; i < nums.length; i++) {
             times += (ans == nums[i] ? 1 : -1);
-            if (times == 0) ans = nums[i];
+            if (times == 0) ans = nums[i + 1];
         }
         return ans;
     }
