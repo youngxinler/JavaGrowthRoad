@@ -3,20 +3,16 @@ package com.sortAndSearch;
 public class SelectionSort implements ArraySort {
     @Override
     public void sort(int[] nums) {
-        for (int i = 0; i < nums.length - 1; i++) {
-            int min = i;
-            for (int j = i; j < nums.length; j++) {
-                if (nums[min] > nums[j]) {
-                    min = j;
-                }
+        for (int i = 1; i < nums.length; i++) {
+            int pos = i;
+            int target = nums[pos];
+            while (pos > 0 && nums[pos - 1] > target) {
+                nums[pos] = nums[pos - 1];
+                pos--;
             }
-            if (i != min) {
-                int temp = nums[i];
-                nums[i] = nums[min];
-                nums[min] = temp;
+            if (pos != i) {
+                nums[pos] = target;
             }
         }
     }
-
-
 }
