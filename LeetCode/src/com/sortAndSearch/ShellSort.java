@@ -5,20 +5,20 @@ public class ShellSort implements ArraySort {
     public void sort(int[] nums) {
         int gap = 1;
         int len = nums.length;
-        while (gap < len / 3) {
+        while (gap < nums.length / 3) {
             gap = gap * 3 + 1;
         }
         while (gap > 0) {
             for (int i = gap; i < len; i++) {
+                int tmp = nums[i];
                 int j = i - gap;
-                int temp = nums[i];
-                while (j >= 0 && nums[j] > temp) {
+                while (j >= 0 && nums[j] > tmp) {
                     nums[j + gap] = nums[j];
                     j -= gap;
                 }
-                nums[j + gap] = temp;
+                nums[j + gap] = tmp;
             }
-            gap = (int) Math.floor(gap / 3);
+            gap /= 3;
         }
     }
 }
