@@ -2,11 +2,10 @@ package com.sortAndSearch;
 
 import java.util.Arrays;
 
-public class MergeSort implements ArraySort {
+public class MergeSort implements IArraySort {
     @Override
-    public void sort(int[] nums) {
-        nums = innerSort(nums);
-        System.out.println(Arrays.toString(nums));
+    public int[] sort(int[] nums) {
+        return innerSort(nums);
     }
 
     private int[] innerSort(int[] nums) {
