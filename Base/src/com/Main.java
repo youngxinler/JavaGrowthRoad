@@ -1,10 +1,6 @@
 package com;
 
-import com.classLoader.MyClassLoader;
-import com.myEnum.EnumSingleInstance;
-
-import java.io.IOException;
-import java.lang.reflect.Method;
+import redis.clients.jedis.Jedis;
 
 /**
  * @author youngxinler  19-6-20 下午3:55
@@ -13,7 +9,13 @@ import java.lang.reflect.Method;
 
 public class Main {
     public static void main(String[] args) throws Exception{
-
+        Jedis jedis = new Jedis("47.93.50.200");
+        String res = jedis.set("hello", "", "nx", "ex", 5L);
+        Thread.sleep(3);
+        String res2 = jedis.set("hello", "", "nx", "ex", 5L);
+        System.out.println(res);
+        System.out.println(res2);
+        System.out.println(jedis.del("world"));
     }
 }
 
