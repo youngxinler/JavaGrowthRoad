@@ -14,6 +14,6 @@ public class RedisLock implements Lock {
     }
 
     public boolean unlock(String key) {
-        return jedis.del(key) != 0;
+        return jedis.del(key) > 0;
     }
 }
