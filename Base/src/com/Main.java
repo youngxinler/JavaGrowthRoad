@@ -1,12 +1,12 @@
 package com;
 
-import com.server.simpleHttpServer.SimpleHttpServer;
+import com.server.multiBlockHttpServer.MultiBlockHttpServer;
 
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        SimpleHttpServer server = new SimpleHttpServer(8888, "C:\\Users\\youngxinler\\Desktop");
+        MultiBlockHttpServer server = new MultiBlockHttpServer(6666, 20);
         server.start();
     }
 }

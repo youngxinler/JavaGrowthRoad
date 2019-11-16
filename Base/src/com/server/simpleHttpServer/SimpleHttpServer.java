@@ -28,8 +28,6 @@ public class SimpleHttpServer {
                 System.out.println(bf);
                 sb.append(bf);
             }
-//            System.out.println(sb.toString());
-//            String uri = getUri(sb.toString());
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             try {
                 String content = getFile("//index.html");
@@ -41,9 +39,9 @@ public class SimpleHttpServer {
                 bw.write("HTTP/1.1 404 Not Found\r\n");
                 bw.write("Content-Type: text/html;charset=UTF-8\r\n\r\n");
             }
+            br.close();
             bw.flush();
             bw.close();
-            br.close();
             socket.close();
         }
     }
@@ -65,7 +63,7 @@ public class SimpleHttpServer {
             }
             br.close();
             return sb.toString();
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new FileNotFoundException();
         } finally {
