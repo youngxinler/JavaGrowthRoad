@@ -9,13 +9,17 @@ import java.util.concurrent.Executors;
 public class MultiBlockHttpServer {
     private ExecutorService executorService;
     private ServerSocket serverSocket;
+    private final String WEBROOT;
 
-    public MultiBlockHttpServer(int port, int nThread) throws IOException {
+    public MultiBlockHttpServer(int port, int nThread, String webRoot) throws IOException {
         executorService = Executors.newFixedThreadPool(nThread);
         serverSocket = new ServerSocket(port);
+        this.WEBROOT = webRoot;
     }
 
     public void start() throws IOException {
+        System.out.println("Start blast!");
+        ConnectionHandler.webRoot = WEBROOT;
         while (true) {
             Socket s = serverSocket.accept();
             System.out.println("来自 " + s.getRemoteSocketAddress() + " 的连接");
