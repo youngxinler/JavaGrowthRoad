@@ -11,30 +11,24 @@ public class QuickSort implements IArraySort {
         return quickSort(nums, 0, nums.length - 1);
     }
 
-    private int[] quickSort(int[] nums, int left, int right) {
-        //left >= right 排序递归终止
-        if (left < right) {
-            //index 为分离之后基准值的下标
-            int index = partition(nums, left, right);
-            //根据分离之后基准值的下标, 再将两边分别进行快排
-            quickSort(nums, left, index);
-            quickSort(nums, index + 1, right);
+    private int[] quickSort(int[] nums, int l, int r) {
+        if (l < r) {
+            int mid = partition(nums, l, r);
+            quickSort(nums, l, mid);
+            quickSort(nums, mid + 1, r);
         }
         return nums;
     }
 
-    //partition函数使以基准值为中心, 分开left < i < right的num[i], 默认使用num[left]作为基准值
-    private int partition(int[] nums, int left, int right) {
-        int index = left + 1;
-        for (int i = index; i <= right; i++) {
-            //下标为i  (left < i < index)  为小于基准值的数
-            if (nums[i] < nums[left]) {
+    private int partition(int[] nums, int l, int r) {
+        int index = l + 1;
+        for (int i = index; i <= r; i++) {
+            if (nums[i] < nums[l]) {
                 swap(nums, index, i);
-                //index++ 使num[index] >= num[left] 即基准值
                 index++;
             }
         }
-        swap(nums, left, index - 1);
+        swap(nums, index - 1, l);
         return index - 1;
     }
 
@@ -43,4 +37,5 @@ public class QuickSort implements IArraySort {
         nums[i] = nums[j];
         nums[j] = tmp;
     }
+
 }
