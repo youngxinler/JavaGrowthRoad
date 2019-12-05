@@ -50,8 +50,5 @@ public class LambdaTargetType {
 //        useAB.use((A)() -> System.out.println("use"));
     }
 
-    public static void main(String[] args) {
-        LambdaTargetType lm = new LambdaTargetType();
-        lm.targetType();
-    }
+
 }
