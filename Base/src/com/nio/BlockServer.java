@@ -13,7 +13,7 @@ public class BlockServer {
     public static void main(String[] args) throws IOException {
         ServerSocketChannel server = ServerSocketChannel.open();
 
-        FileChannel outChannel = FileChannel.open(Paths.get("C:\\Users\\youngxinler\\Desktop\\ppppp.txt"), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+        FileChannel outChannel = FileChannel.open(Paths.get("C:\\Users\\youngxinler\\Desktop\\index.html"), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
 
         server.bind(new InetSocketAddress(6666));
 

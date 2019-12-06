@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 
 public class HttpHandler implements Runnable {
     private static final int BUFFER_SIZE = 1024;
-    private static final String CHARSET = "UTF-8";
+    public static final String CHARSET = "UTF-8";
     private SelectionKey key;
 
     public static final String RIGHT_HEADER = "HTTP/1.1 200 OK\r\nContent-Type: text/html;charset=UTF-8\r\nConnection: close\r\n\r\n";
