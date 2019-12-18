@@ -39,7 +39,7 @@ public class Banker {
         }
     }
 
-    private void disPlayInfo() {
+    private void displayInfo() {
         System.out.println("---------资源信息展示---------");
         for (int i = 1; i <= threadNum; i++) {
             System.out.printf("P%d:   ", i);
@@ -81,7 +81,7 @@ public class Banker {
     public static void main(String[] args) {
         Banker banker = new Banker();
         banker.init();
-        banker.disPlayInfo();
+        banker.displayInfo();
         banker.judge();
     }
 }
