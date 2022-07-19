@@ -40,8 +40,9 @@ public class IcebergSinkTask extends SinkTask {
         }
 
         Set<TopicPartition> assignedPartition = this.context.assignment();
-        assignedPartition.stream().map(x -> x.partition()).
-                outputFileFactory = OutputFileFactory.builderFor(table, )
+        assignedPartition.stream().map(x -> x.partition());
+        outputFileFactory = OutputFileFactory.builderFor(table, );
+
     }
 
     @Override
