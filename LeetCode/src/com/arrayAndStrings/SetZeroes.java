@@ -65,4 +65,37 @@ public class SetZeroes {
         }
         if (firstRow) matrix[0] = new int[clen];
     }
+
+    public void setZeroes_2(int[][] matrix){
+        boolean firstRow = false;
+        int rl = matrix.length;
+        int cl = matrix[0].length;
+        for (int i = 0; i < cl; i++){
+            if (matrix[0][i] == 0) {
+                firstRow = true;
+                break;
+            }
+        }
+        for (int i = 0; i < rl; i++){
+            for (int j = 0; j < cl; j++){
+                if (matrix[i][j] == 0){
+                    matrix[i][0] = 0;
+                    matrix[0][j] = 0;
+                }
+            }
+        }
+        for (int i = 1; i < rl; i++){
+            if (matrix[i][0] == 0){
+                matrix[i] = new int[cl];
+            }
+        }
+        for (int j = 0; j < cl; j++){
+            if (matrix[0][j] == 0){
+                for (int i = 0; i < rl; i++){
+                    matrix[i][j] =0;
+                }
+            }
+        }
+        if (firstRow) matrix[0] = new int[cl];
+    }
 }
