@@ -1,10 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 
-!**/pom.xml
-
-*.xml
+!**/target/
 *.iml
-
 .idea
 Base/target/
 out/
