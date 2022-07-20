@@ -1,11 +1,15 @@
 package com.yxler;
 
+import com.google.common.collect.Maps;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.iceberg.CatalogUtil;
-import org.apache.iceberg.Table;
+import org.apache.iceberg.*;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.data.GenericAppenderFactory;
+import org.apache.iceberg.data.Record;
+import org.apache.iceberg.io.BaseTaskWriter;
 import org.apache.iceberg.io.OutputFileFactory;
+import org.apache.iceberg.io.UnpartitionedWriter;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.connect.sink.SinkRecord;
@@ -13,14 +17,23 @@ import org.apache.kafka.connect.sink.SinkTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 public class IcebergSinkTask extends SinkTask {
     private static final Logger log = LoggerFactory.getLogger(IcebergSinkTask.class);
+
     private Map<String, String> properties;
-    private OutputFileFactory outputFileFactory;
+    private final Map<TopicPartition, BaseTaskWriter> writers = Maps.newHashMap();
+    private FileFormat fileFormat;
+    private GenericAppenderFactory appenderFactory;
+    private Table table;
+    private Catalog catalog;
+    private int sinkTaskId;
+    private long targetFileSize = 50L * 1024 * 1024;
+
 
     public IcebergSinkTask() {
     }
@@ -32,22 +45,46 @@ public class IcebergSinkTask extends SinkTask {
         String catalogImpl = properties.get("kafka.iceberg.catalog.impl");
         String tableIdentify = properties.get("kafka.iceberg.sink.table");
         Configuration hadoopConfiguration = new Configuration();
-        Catalog catalog = CatalogUtil.loadCatalog(catalogImpl, catalogName, props, hadoopConfiguration);
+        this.catalog = CatalogUtil.loadCatalog(catalogImpl, catalogName, props, hadoopConfiguration);
         TableIdentifier tableIdentifier = TableIdentifier.of(tableIdentify);
-        Table table = catalog.loadTable(tableIdentifier);
-        if (table == null) {
+        if (catalog.tableExists(tableIdentifier)) {
             throw new IllegalArgumentException(String.format("iceberg table {} not exist", tableIdentify));
         }
 
-        Set<TopicPartition> assignedPartition = this.context.assignment();
-        assignedPartition.stream().map(x -> x.partition());
-        outputFileFactory = OutputFileFactory.builderFor(table, );
+        this.table = catalog.loadTable(tableIdentifier);
+        fileFormat = getFileFormat(table.properties(), props);
+        this.appenderFactory = new GenericAppenderFactory(table.schema());
+        this.sinkTaskId = Integer.parseInt(props.get("kafka.iceberg.sink.task.id"));
+        if (props.containsKey("kafka.iceberg.sink.task.targetFileSize")) {
+            this.targetFileSize = Long.parseLong(props.get("kafka.iceberg.sink.task.targetFileSize"));
+        }
 
+        Set<TopicPartition> assignedPartition = this.context.assignment();
+        if (table.spec().isUnpartitioned()) {
+            for (TopicPartition topicPartition : assignedPartition) {
+                OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, topicPartition.partition(), sinkTaskId).format(fileFormat).build();
+                UnpartitionedWriter unpartitionedWriter = new UnpartitionedWriter<Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize);
+                writers.put(topicPartition, unpartitionedWriter);
+            }
+        } else {
+            for (TopicPartition topicPartition : assignedPartition) {
+                OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, topicPartition.partition(), sinkTaskId).format(fileFormat).build();
+                KafkaPartitionedWriter kafkaPartitionedWriter = new KafkaPartitionedWriter<Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize, table.schema());
+                writers.put(topicPartition, kafkaPartitionedWriter);
+            }
+        }
     }
 
     @Override
-    public void put(Collection<SinkRecord> collection) {
-
+    public void put(Collection<SinkRecord> records) {
+        for (SinkRecord record : records) {
+            TopicPartition topicPartition = new TopicPartition(record.topic(), record.kafkaPartition());
+            try {
+                writers.get(topicPartition).write(record);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
@@ -58,11 +95,37 @@ public class IcebergSinkTask extends SinkTask {
 
     @Override
     public void flush(Map<TopicPartition, OffsetAndMetadata> currentOffsets) {
-        super.flush(currentOffsets);
+        AppendFiles appendFiles = table.newAppend();
+        boolean fail = false;
+        try {
+            for (BaseTaskWriter taskWriter : writers.values()) {
+                for (DataFile dataFile : taskWriter.dataFiles()) {
+                    appendFiles.appendFile(dataFile);
+                }
+            }
+        } catch (IOException e) {
+            fail = true;
+            log.error("append files error, currentOffsets {}", currentOffsets, e);
+        }
+        // todo add kafka info
+        if (!fail) {
+            Snapshot snapshot = appendFiles.apply();
+            appendFiles.commit();
+            log.info("snapshot {} is commit", snapshot.snapshotId());
+        }
     }
 
     @Override
     public String version() {
         return null;
+    }
+
+    private FileFormat getFileFormat(Map<String, String> tableProperties, Map<String, String> userProperties) {
+        String tableFileFormat = tableProperties.get("write.format.default");
+        String userFileFormat = userProperties.getOrDefault("kafka.iceberg.sink.table.file.format", "parquet");
+        if (tableFileFormat != null) {
+            return FileFormat.fromFileName(tableFileFormat);
+        }
+        return FileFormat.fromFileName(userFileFormat);
     }
 }

@@ -8,6 +8,7 @@ import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.io.OutputFileFactory;
+import org.apache.iceberg.io.PartitionedWriter;
 import org.apache.iceberg.io.UnpartitionedWriter;
 import org.apache.iceberg.relocated.com.google.common.collect.Streams;
 import org.apache.iceberg.types.Types;
@@ -111,5 +112,10 @@ public class IcebergTest {
         Snapshot res = appendFiles.apply();
         appendFiles.commit();
         System.out.println(res);
+    }
+
+    @Test
+    public void test() {
+
     }
 }
