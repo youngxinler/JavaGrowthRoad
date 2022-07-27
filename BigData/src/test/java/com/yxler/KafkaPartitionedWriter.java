@@ -10,7 +10,7 @@ import org.apache.iceberg.io.FileIO;
 import org.apache.iceberg.io.OutputFileFactory;
 import org.apache.iceberg.io.PartitionedWriter;
 
-public class KafkaPartitionedWriter<T> extends PartitionedWriter<T> {
+class KafkaPartitionedWriter<T> extends PartitionedWriter<T> {
 
     private Schema schema;
     private PartitionKey partitionKey;

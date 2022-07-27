@@ -8,7 +8,6 @@ import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.io.OutputFileFactory;
-import org.apache.iceberg.io.PartitionedWriter;
 import org.apache.iceberg.io.UnpartitionedWriter;
 import org.apache.iceberg.relocated.com.google.common.collect.Streams;
 import org.apache.iceberg.types.Types;
@@ -31,7 +30,8 @@ public class IcebergTest {
     public void hadoopTableTest() {
         Configuration configuration = new Configuration();
         configuration.set("ipc.client.fallback-to-simple-auth-allowed", "true");
-        String icebergWareHousePath = "hdfs://localhost:9000/iceberg";
+//        String icebergWareHousePath = "hdfs://localhost:9000/iceberg";
+        String icebergWareHousePath = "/home/yxler/Desktop/data/iceberg";
         HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
 
         TableIdentifier name = TableIdentifier.of("logging", "logs");

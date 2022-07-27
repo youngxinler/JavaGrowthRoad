@@ -9,7 +9,6 @@ import org.apache.iceberg.data.GenericAppenderFactory;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.io.BaseTaskWriter;
 import org.apache.iceberg.io.OutputFileFactory;
-import org.apache.iceberg.io.UnpartitionedWriter;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.connect.sink.SinkRecord;
@@ -63,13 +62,13 @@ public class IcebergSinkTask extends SinkTask {
         if (table.spec().isUnpartitioned()) {
             for (TopicPartition topicPartition : assignedPartition) {
                 OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, topicPartition.partition(), sinkTaskId).format(fileFormat).build();
-                UnpartitionedWriter unpartitionedWriter = new UnpartitionedWriter<Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize);
+                KafkaUnpartitionedWriter<Record> unpartitionedWriter = new KafkaUnpartitionedWriter<Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize);
                 writers.put(topicPartition, unpartitionedWriter);
             }
         } else {
             for (TopicPartition topicPartition : assignedPartition) {
                 OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, topicPartition.partition(), sinkTaskId).format(fileFormat).build();
-                KafkaPartitionedWriter kafkaPartitionedWriter = new KafkaPartitionedWriter<Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize, table.schema());
+                KafkaPartitionedWriter<Record> kafkaPartitionedWriter = new KafkaPartitionedWriter<Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize, table.schema());
                 writers.put(topicPartition, kafkaPartitionedWriter);
             }
         }
@@ -89,7 +88,13 @@ public class IcebergSinkTask extends SinkTask {
 
     @Override
     public void stop() {
-
+        for (BaseTaskWriter taskWriter : writers.values()) {
+            try {
+                taskWriter.close();
+            } catch (IOException e) {
+                log.error("task writer close error", e);
+            }
+        }
     }
 
 
@@ -107,7 +112,7 @@ public class IcebergSinkTask extends SinkTask {
             fail = true;
             log.error("append files error, currentOffsets {}", currentOffsets, e);
         }
-        // todo add kafka info
+        // todo add kafka info snapshot.summary().put();
         if (!fail) {
             Snapshot snapshot = appendFiles.apply();
             appendFiles.commit();
