@@ -11,8 +11,10 @@ import org.apache.iceberg.io.OutputFileFactory;
 import org.apache.iceberg.io.UnpartitionedWriter;
 import org.apache.iceberg.relocated.com.google.common.collect.Streams;
 import org.apache.iceberg.types.Types;
+import org.apache.kafka.connect.sink.SinkTaskContext;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -26,12 +28,21 @@ import java.util.stream.Collectors;
  */
 public class IcebergTest {
 
+    String icebergWareHousePath = "/home/yxler/Desktop/data/iceberg";
+
+    @Before
+    public void init() {
+        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+            icebergWareHousePath = "B:\\tmp\\iceberg";
+        }
+    }
+
     @Test
     public void hadoopTableTest() {
         Configuration configuration = new Configuration();
         configuration.set("ipc.client.fallback-to-simple-auth-allowed", "true");
 //        String icebergWareHousePath = "hdfs://localhost:9000/iceberg";
-        String icebergWareHousePath = "/home/yxler/Desktop/data/iceberg";
+
         HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
 
         TableIdentifier name = TableIdentifier.of("logging", "logs");
@@ -118,4 +129,6 @@ public class IcebergTest {
     public void test() {
 
     }
+
+    SinkTaskContext
 }
