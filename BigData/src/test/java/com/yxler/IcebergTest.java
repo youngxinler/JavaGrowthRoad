@@ -1,5 +1,6 @@
 package com.yxler;
 
+import io.confluent.connect.hdfs.HdfsSinkConnector;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.*;
 import org.apache.iceberg.catalog.TableIdentifier;
@@ -11,6 +12,7 @@ import org.apache.iceberg.io.OutputFileFactory;
 import org.apache.iceberg.io.UnpartitionedWriter;
 import org.apache.iceberg.relocated.com.google.common.collect.Streams;
 import org.apache.iceberg.types.Types;
+import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.sink.SinkTaskContext;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
@@ -129,6 +131,4 @@ public class IcebergTest {
     public void test() {
 
     }
-
-    SinkTaskContext
 }
