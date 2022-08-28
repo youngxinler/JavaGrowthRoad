@@ -13,7 +13,7 @@ import org.apache.iceberg.io.PartitionedWriter;
 class KafkaPartitionedWriter<T> extends PartitionedWriter<T> {
 
     private Schema schema;
-    private PartitionKey partitionKey;
+    private final PartitionKey partitionKey;
 
     protected KafkaPartitionedWriter(PartitionSpec spec, FileFormat format, FileAppenderFactory appenderFactory, OutputFileFactory fileFactory, FileIO io, long targetFileSize, Schema schema) {
         super(spec, format, appenderFactory, fileFactory, io, targetFileSize);

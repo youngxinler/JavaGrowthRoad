@@ -1,84 +1,93 @@
-//
-//
-//
-//import java.util.*;
-//
-//
-//
-//public class Main {
-//    static char[][] map;
-//    static int ans;
-//    static boolean[][] vis;
-//    static boolean ok;
-//    static int[][] dp;
-//    public static void main(String[] args) {
-//        Scanner sc = new Scanner(System.in);
-//        while (sc.hasNext()){
-//            int T = sc.nextInt();
-//            while (T-- != 0){
-//                int n = sc.nextInt();
-//                int m = sc.nextInt();
-//                sc.nextLine();
-//                map = new char[n][m];
-//                vis = new boolean[n][m];
-//                dp = new int[n][m];
-//                ans = Integer.MAX_VALUE;
-//                ok = false;
-//                int si = -1;
-//                int sj = -1;
-//                for (int i = 0; i < n; i++) {
-//                    char[] cs = sc.nextLine().toCharArray();
-//                    Arrays.fill(dp[i], Integer.MAX_VALUE);
-//                    for (int j = 0; j < m; j++) {
-//                        if ((map[i][j] = cs[j]) == '@'){
-//                            si = i;
-//                            sj = j;
-//                        }
-//                    }
-//                }
-//                if (si == 0 || sj == 0 || si == map.length - 1 || sj == map[0].length - 1){
-//                    System.out.println(0);
-//                }else {
-//                    dfs(si, sj, 0);
-//                    System.out.println(ok ? ans : -1);
-//                }
-//            }
-//        }
-//    }
-//
-//
-//    private static void dfs(int i, int j, int cur){
-//        if (i < 0 || j < 0 || i > map.length || j > map[0].length){
-//            return;
-//        }
-//        if(map[i][j] == '#' || vis[i][j]){
-//            return;
-//        }
-//        if (ok && ans <= cur){
-//            return;
-//        }
-//        if (cur )
-//        int rl = map.length;
-//        int cl = map[0].length;
-//        if(i == 0 || j == 0 || i == rl - 1 || j == cl - 1){
-//            if (map[i][j] == '.') {
-//                ok = true;
-//                ans = Math.min(ans, cur);
-//            }if (map[i][j] == '*'){
-//                ok = true;
-//                ans = Math.min(ans, cur + 1);
-//            }
-//            return;
-//        }
-//        vis[i][j] = true;
-//        if (map[i][j] == '*'){
-//            cur = cur + 1;
-//        }
-//        dp[i][j] = Math.min(cur, dp[i][j]);
-//        dfs(i + 1, j, cur);
-//        dfs(i, j + 1, cur);
-//        dfs(i - 1, j, cur);
-//        dfs(i, j - 1, cur);
-//        vis[i][j] = false;
-//    }
-//}
+import java.util.*;
+
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+    TreeNode(int x) { val = x; }
+}
+
+
+public class Main {
+    public static void main(String[] args) {
+        Main main = new Main();
+        String res = main.minNumber(new int[]{121, 12});
+        System.out.println(res);
+    }
+
+    public String minNumber(int[] nums) {
+        List<String> numStrs = new ArrayList<>();
+        for (int num : nums) {
+            numStrs.add(num + "");
+        }
+        Collections.sort(numStrs, (a, b) -> (a + b).compareTo(b + a));
+        StringBuilder sb = new StringBuilder();
+        for (String str : numStrs) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+}
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Codec {
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        if (root == null) {
+            return "";
+        }
+
+        String left = serialize(root.left);
+        int rootVal = root.val;
+        String right = serialize(root.right);
+        return "(" + left + ")" + root + "(" + right + ")";
+    }
+    private int index;
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        this.index = 0;
+        return deserCore(data);
+    }
+
+    private TreeNode deserCore(String data) {
+        if (index >= data.length() || data.charAt(index) == ')') {
+            return null;
+        }
+        index++;
+        TreeNode left = deserCore(data);
+        index++;
+        int rootVal = parseInt(data);
+        index++;
+        TreeNode right = deserCore(data);
+        index++;
+        TreeNode curRoot = new TreeNode(rootVal);
+        curRoot.left = left;
+        curRoot.right = right;
+        return curRoot;
+    }
+
+
+
+    private int parseInt(String data) {
+        int res = 0;
+        while (index < data.length() && Character.isDigit(data.charAt(index))) {
+            int cur = data.charAt(index) - '0';
+            res = res * 10 + cur;
+            index++;
+        }
+        return res;
+    }
+}
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec = new Codec();
+// codec.deserialize(codec.serialize(root));

@@ -1,6 +1,6 @@
 package com.yxler;
 
-import io.confluent.connect.hdfs.HdfsSinkConnector;
+import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.*;
 import org.apache.iceberg.catalog.TableIdentifier;
@@ -8,8 +8,7 @@ import org.apache.iceberg.data.GenericAppenderFactory;
 import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.hadoop.HadoopCatalog;
-import org.apache.iceberg.io.OutputFileFactory;
-import org.apache.iceberg.io.UnpartitionedWriter;
+import org.apache.iceberg.io.*;
 import org.apache.iceberg.relocated.com.google.common.collect.Streams;
 import org.apache.iceberg.types.Types;
 import org.apache.kafka.connect.sink.SinkRecord;
@@ -19,7 +18,10 @@ import org.apache.spark.sql.SparkSession;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.file.FileSystem;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -30,7 +32,7 @@ import java.util.stream.Collectors;
  */
 public class IcebergTest {
 
-    String icebergWareHousePath = "/home/yxler/Desktop/data/iceberg";
+    String icebergWareHousePath = "/Users/yxler/data/iceberg";
 
     @Before
     public void init() {
@@ -40,13 +42,9 @@ public class IcebergTest {
     }
 
     @Test
-    public void hadoopTableTest() {
+    public void hadoopUnPartitionTableTest() {
         Configuration configuration = new Configuration();
-        configuration.set("ipc.client.fallback-to-simple-auth-allowed", "true");
-//        String icebergWareHousePath = "hdfs://localhost:9000/iceberg";
-
         HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
-
         TableIdentifier name = TableIdentifier.of("logging", "logs");
         Schema schema = new Schema(
                 Types.NestedField.required(1, "level", Types.StringType.get()),
@@ -56,6 +54,75 @@ public class IcebergTest {
         PartitionSpec spec = PartitionSpec.unpartitioned();
 
         Table table = hadoopCatalog.createTable(name, schema, spec);
+    }
+
+    @Test
+    public void hadoopPartitionTableTest() {
+        Configuration configuration = new Configuration();
+        HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
+        TableIdentifier name = TableIdentifier.of("logging", "logs_partitioned");
+        Schema schema = new Schema(
+                Types.NestedField.required(1, "level", Types.StringType.get()),
+                Types.NestedField.required(2, "event_time", Types.LongType.get()),
+                Types.NestedField.required(3, "message", Types.StringType.get())
+        );
+        PartitionSpec spec = PartitionSpec.builderFor(schema).bucket("level", 4).build();
+        Table table = hadoopCatalog.createTable(name, schema, spec);
+    }
+
+    class OwnPartitionedWrite<T extends StructLike> extends PartitionedWriter<T> {
+        private PartitionKey partitionKey;
+
+        public OwnPartitionedWrite(PartitionSpec spec, FileFormat format, FileAppenderFactory<T> appenderFactory, OutputFileFactory fileFactory, FileIO io, long targetFileSize) {
+            super(spec, format, appenderFactory, fileFactory, io, targetFileSize);
+            this.partitionKey = new PartitionKey(spec, spec().schema());
+        }
+
+        @Override
+        protected PartitionKey partition(T t) {
+            this.partitionKey.partition(t);
+            return this.partitionKey;
+        }
+    }
+
+    @Test
+    public void writePartitionedTableData() throws Exception {
+        hadoopPartitionTableTest();
+        Configuration configuration = new Configuration();
+        HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
+        TableIdentifier name = TableIdentifier.of("logging", "logs_partitioned");
+        Table table = hadoopCatalog.loadTable(name);
+
+        GenericAppenderFactory appenderFactory = new GenericAppenderFactory(table.schema());
+        OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, 1, 1).format(FileFormat.PARQUET).build();
+        OwnPartitionedWrite<Record> recordPartitionedWriter = new OwnPartitionedWrite<>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES);
+        Random random = new Random();
+        List<String> levels = Arrays.asList("info", "debug", "error", "warn");
+        for (int i = 0; i < 10000; i++) {
+            GenericRecord genericRecord = GenericRecord.create(table.schema());
+            genericRecord.setField("level",  levels.get(random.nextInt(levels.size())));
+            genericRecord.setField("event_time", System.currentTimeMillis());
+            genericRecord.setField("message", "nice" + System.currentTimeMillis());
+            recordPartitionedWriter.write(genericRecord);
+        }
+        recordPartitionedWriter.close();
+
+        AppendFiles appendFiles = table.newAppend();
+        for (DataFile dataFile : recordPartitionedWriter.dataFiles()) {
+            appendFiles.appendFile(dataFile);
+        }
+        Snapshot res = appendFiles.apply();
+        appendFiles.commit();
+        System.out.println(res);
+    }
+
+    @Test
+    public void deltaWritePartitionedTableData() {
+        Configuration configuration = new Configuration();
+        HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
+        TableIdentifier name = TableIdentifier.of("logging", "logs_partitioned");
+        Table table = hadoopCatalog.loadTable(name);
+
     }
 
 
@@ -102,8 +169,6 @@ public class IcebergTest {
     @Test
     public void insertData() throws Exception {
         Configuration configuration = new Configuration();
-        configuration.set("ipc.client.fallback-to-simple-auth-allowed", "true");
-        String icebergWareHousePath = "hdfs://localhost:9000/iceberg";
         HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
         TableIdentifier name = TableIdentifier.of("logging", "logs");
         Table table = hadoopCatalog.loadTable(name);
@@ -112,10 +177,12 @@ public class IcebergTest {
         OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, 1, 1).format(FileFormat.PARQUET).build();
         UnpartitionedWriter<Record> unpartitionedWriter = new UnpartitionedWriter<Record>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES);
         GenericRecord genericRecord = GenericRecord.create(table.schema());
-        genericRecord.setField("level", "info");
-        genericRecord.setField("event_time", System.currentTimeMillis());
-        genericRecord.setField("message", "nice");
-        unpartitionedWriter.write(genericRecord);
+        for (int i = 0; i < 10000; i++) {
+            genericRecord.setField("level", "info" + System.currentTimeMillis());
+            genericRecord.setField("event_time", System.currentTimeMillis());
+            genericRecord.setField("message", "nice" + System.currentTimeMillis());
+            unpartitionedWriter.write(genericRecord);
+        }
         unpartitionedWriter.close();
 
         AppendFiles appendFiles = table.newAppend();
@@ -132,3 +199,4 @@ public class IcebergTest {
 
     }
 }
+
