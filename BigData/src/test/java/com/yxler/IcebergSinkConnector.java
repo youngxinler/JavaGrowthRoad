@@ -32,6 +32,7 @@ public class IcebergSinkConnector extends SinkConnector {
         Map<String, String> taskOwnProperty = new HashMap<>(properties);
 
         for (int i = 0; i < taskNum; i++) {
+            taskOwnProperty.put("kafka.iceberg.sink.task.id", i + "");
             taskProperties.add(taskOwnProperty);
         }
         return taskProperties;

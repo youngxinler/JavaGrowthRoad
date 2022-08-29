@@ -11,7 +11,8 @@ class IcebergScalaTest extends FunSuite with Matchers {
     val sparkConf = new SparkConf().setAppName("test").setIfMissing("spark.master", "local")
     sparkConf.set("spark.sql.catalog.hadoop_prod", "org.apache.iceberg.spark.SparkCatalog")
     sparkConf.set("spark.sql.catalog.hadoop_prod.type", "hadoop")
-    sparkConf.set("spark.sql.catalog.hadoop_prod.warehouse", "hdfs://localhost:9000/iceberg")
+//    sparkConf.set("spark.sql.catalog.hadoop_prod.warehouse", "hdfs://localhost:9000/iceberg")
+    sparkConf.set("spark.sql.catalog.hadoop_prod.warehouse", "/home/yxler/Desktop/data/iceberg")
     val spark = SparkSession.builder.config(sparkConf).getOrCreate
     spark.sparkContext.hadoopConfiguration.set("ipc.client.fallback-to-simple-auth-allowed", "true")
     val sqlContext = spark.sqlContext
@@ -31,7 +32,7 @@ class IcebergScalaTest extends FunSuite with Matchers {
     spark.sql("select * from hadoop_prod.logging.logs").show()
     //    val tables = sqlContext.sql("show logging.tables").collect()
     //    tables.foreach(r => println(r))
-    insertDf.writeTo("hadoop_prod.logging.logs").append()
+//    insertDf.writeTo("hadoop_prod.logging.logs").append()
   }
 
 
