@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.nio.file.FileSystem;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class IcebergTest {
         }
 
         @Override
-        protected PartitionKey partition(T t) {
+        public PartitionKey partition(T t) {
             this.partitionKey.partition(t);
             return this.partitionKey;
         }
@@ -95,22 +96,38 @@ public class IcebergTest {
 
         GenericAppenderFactory appenderFactory = new GenericAppenderFactory(table.schema());
         OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, 1, 1).format(FileFormat.PARQUET).build();
-        OwnPartitionedWrite<Record> recordPartitionedWriter = new OwnPartitionedWrite<>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES);
+        HashMap<PartitionKey, PartitionedWriter<Record>> writerMap = new HashMap<>();
+
         Random random = new Random();
         List<String> levels = Arrays.asList("info", "debug", "error", "warn");
+        GenericRecord genericRecord = GenericRecord.create(table.schema());
+        PartitionKey commonPartition = new PartitionKey(table.spec(), table.schema());
+
         for (int i = 0; i < 10000; i++) {
-            GenericRecord genericRecord = GenericRecord.create(table.schema());
-            genericRecord.setField("level",  levels.get(random.nextInt(levels.size())));
-            genericRecord.setField("event_time", System.currentTimeMillis());
-            genericRecord.setField("message", "nice" + System.currentTimeMillis());
-            recordPartitionedWriter.write(genericRecord);
+            GenericRecord record = genericRecord.copy();
+            record.setField("level",  levels.get(random.nextInt(levels.size())));
+            record.setField("event_time", System.currentTimeMillis());
+            record.setField("message", "nice" + System.currentTimeMillis());
+
+            commonPartition.partition(record);
+
+            if (!writerMap.containsKey(commonPartition)) {
+                PartitionKey partitionKey = commonPartition.copy();
+                OwnPartitionedWrite<Record> recordPartitionedWriter = new OwnPartitionedWrite<>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES);
+                writerMap.put(partitionKey, recordPartitionedWriter);
+            }
+
+            writerMap.get(commonPartition).write(record);
         }
-        recordPartitionedWriter.close();
+
 
         AppendFiles appendFiles = table.newAppend();
-        for (DataFile dataFile : recordPartitionedWriter.dataFiles()) {
-            appendFiles.appendFile(dataFile);
+
+        for (PartitionedWriter<Record> partitionedWriter : writerMap.values()) {
+            Arrays.stream(partitionedWriter.dataFiles()).forEach(appendFiles::appendFile);
+            partitionedWriter.close();
         }
+
         Snapshot res = appendFiles.apply();
         appendFiles.commit();
         System.out.println(res);
