@@ -32,15 +32,16 @@ import java.util.stream.Collectors;
  * @date 2022-07-15  23:33
  */
 public class IcebergTest {
-
-    String icebergWareHousePath = "/Users/yxler/data/iceberg";
-
     @Before
     public void init() {
         if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
             icebergWareHousePath = "B:\\tmp\\iceberg";
         }
     }
+
+
+    String icebergWareHousePath = "/Users/yxler/data/iceberg";
+
 
     @Test
     public void hadoopUnPartitionTableTest() {
@@ -58,7 +59,7 @@ public class IcebergTest {
     }
 
     @Test
-    public void hadoopPartitionTableTest() {
+    public void hadoopPartitionTableCreateTest() {
         Configuration configuration = new Configuration();
         HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
         TableIdentifier name = TableIdentifier.of("logging", "logs_partitioned");
@@ -88,7 +89,7 @@ public class IcebergTest {
 
     @Test
     public void writePartitionedTableData() throws Exception {
-        hadoopPartitionTableTest();
+        hadoopPartitionTableCreateTest();
         Configuration configuration = new Configuration();
         HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
         TableIdentifier name = TableIdentifier.of("logging", "logs_partitioned");
@@ -96,6 +97,7 @@ public class IcebergTest {
 
         GenericAppenderFactory appenderFactory = new GenericAppenderFactory(table.schema());
         OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, 1, 1).format(FileFormat.PARQUET).build();
+        // 这里的writerMap用于放置针对于不同分区数据的writer, 由分区生产的partitionKey获取相应的writer
         HashMap<PartitionKey, PartitionedWriter<Record>> writerMap = new HashMap<>();
 
         Random random = new Random();
@@ -109,10 +111,12 @@ public class IcebergTest {
             record.setField("event_time", System.currentTimeMillis());
             record.setField("message", "nice" + System.currentTimeMillis());
 
+            // partitionKey调用partition会重置其中的状态化的分区值, 从而获取属于该row的partitionKey
             commonPartition.partition(record);
 
             if (!writerMap.containsKey(commonPartition)) {
                 PartitionKey partitionKey = commonPartition.copy();
+                // 没有获取到指定partitionKey的writer, 说明之前没有该分区的数据, 生产一个用于该分区写入的partitionWriter
                 OwnPartitionedWrite<Record> recordPartitionedWriter = new OwnPartitionedWrite<>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES);
                 writerMap.put(partitionKey, recordPartitionedWriter);
             }
@@ -123,6 +127,7 @@ public class IcebergTest {
 
         AppendFiles appendFiles = table.newAppend();
 
+        // 将写入的所有文件, 通过table的api进行提交
         for (PartitionedWriter<Record> partitionedWriter : writerMap.values()) {
             Arrays.stream(partitionedWriter.dataFiles()).forEach(appendFiles::appendFile);
             partitionedWriter.close();
@@ -184,16 +189,25 @@ public class IcebergTest {
     private static final long TARGET_FILE_SIZE_IN_BYTES = 50L * 1024 * 1024;
 
     @Test
-    public void insertData() throws Exception {
+    public void insertUnPartitionTableData() throws Exception {
+        // 通过Hadoop Catalogs 初始化"logs"的table对象
         Configuration configuration = new Configuration();
         HadoopCatalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
         TableIdentifier name = TableIdentifier.of("logging", "logs");
         Table table = hadoopCatalog.loadTable(name);
 
+        // GenricAppenderFactory是iceberg的一条Record(数据表中的一行)的工厂;
+        // 可通过该工厂创建Record
         GenericAppenderFactory appenderFactory = new GenericAppenderFactory(table.schema());
-        OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, 1, 1).format(FileFormat.PARQUET).build();
-        UnpartitionedWriter<Record> unpartitionedWriter = new UnpartitionedWriter<Record>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES);
         GenericRecord genericRecord = GenericRecord.create(table.schema());
+
+        // iceberg表在写入数据的时候, 通过OutputFileFactory来获取要写入的数据文件, 该文件路径通过生成表设置的warehouse路径和分区字段来生成, 通过文件路径来调用底层的FileIO来获取写入文件的OutputFile对象.
+        OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, 1, 1).format(FileFormat.PARQUET).build();
+
+        // 非分区表直接生成一个写入的Writer的就可以了, 这里官方Api有具体实现, 直接调用就可以.
+        UnpartitionedWriter<Record> unpartitionedWriter = new UnpartitionedWriter<Record>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES);
+
+        // 写入一万条数据.
         for (int i = 0; i < 10000; i++) {
             genericRecord.setField("level", "info" + System.currentTimeMillis());
             genericRecord.setField("event_time", System.currentTimeMillis());
@@ -202,13 +216,15 @@ public class IcebergTest {
         }
         unpartitionedWriter.close();
 
+
+        // 以上写入数据文件之后, 通过Table的Api对写入的数据文件提交到表的元数据中.
         AppendFiles appendFiles = table.newAppend();
         for (DataFile dataFile : unpartitionedWriter.dataFiles()) {
             appendFiles.appendFile(dataFile);
         }
+        // 提交的文件生成一个snapshot并进行提交.
         Snapshot res = appendFiles.apply();
         appendFiles.commit();
-        System.out.println(res);
     }
 
     @Test
