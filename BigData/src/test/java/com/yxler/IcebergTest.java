@@ -4,9 +4,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.*;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
-import org.apache.iceberg.data.GenericAppenderFactory;
-import org.apache.iceberg.data.GenericRecord;
-import org.apache.iceberg.data.Record;
+import org.apache.iceberg.data.*;
+import org.apache.iceberg.expressions.Expression;
+import org.apache.iceberg.expressions.Expressions;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.io.*;
 import org.apache.iceberg.relocated.com.google.common.collect.Streams;
@@ -17,11 +17,11 @@ import org.apache.parquet.schema.LogicalTypeAnnotation;
 import org.apache.parquet.hadoop.ColumnChunkPageWriteStore;
 import org.junit.Before;
 import org.junit.Test;
+import org.apache.avro.LogicalTypes;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -90,56 +90,6 @@ public class IcebergTest {
         }
     }
 
-    @Test
-    public void writePartitionedTableData() throws Exception {
-//        hadoopPartitionTableCreateTest();
-        Configuration configuration = new Configuration();
-        Catalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
-        // Load table from catalog
-        TableIdentifier name = TableIdentifier.of("logging", "logs");
-        Table table = hadoopCatalog.loadTable(name);
-
-
-        GenericAppenderFactory appenderFactory = new GenericAppenderFactory(table.schema());
-
-        int partitionId = 1, taskId = 1;
-        OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(FileFormat.PARQUET).build();
-        final PartitionKey partitionKey = new PartitionKey(table.spec(), table.spec().schema());
-
-        // partitionedFanoutWriter will auto partitioned record and create the partitioned writer
-        PartitionedFanoutWriter<Record> partitionedFanoutWriter = new PartitionedFanoutWriter<Record>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES) {
-            @Override
-            protected PartitionKey partition(Record record) {
-                partitionKey.partition(record);
-                return partitionKey;
-            }
-        };
-
-        Random random = new Random();
-        List<String> levels = Arrays.asList("info", "debug", "error", "warn");
-        GenericRecord genericRecord = GenericRecord.create(table.schema());
-
-        // assume write 1000 records
-        for (int i = 0; i < 1000; i++) {
-            GenericRecord record = genericRecord.copy();
-            record.setField("level",  levels.get(random.nextInt(levels.size())));
-//            record.setField("event_time", new java.sql.Timestamp(new Date().getTime()));
-            record.setField("event_time", System.currentTimeMillis());
-            record.setField("message", "Iceberg is a great table format");
-            record.setField("call_stack", Arrays.asList("NullPointerException"));
-            partitionedFanoutWriter.write(record);
-        }
-
-
-        AppendFiles appendFiles = table.newAppend();
-
-        // submit datafiles to the table
-        Arrays.stream(partitionedFanoutWriter.dataFiles()).forEach(appendFiles::appendFile);
-
-        // submit snapshot
-        Snapshot newSnapshot = appendFiles.apply();
-        appendFiles.commit();
-    }
 
     @Test
     public void testPartitionedKey() throws Exception{
@@ -288,20 +238,80 @@ public class IcebergTest {
             unpartitionedWriter.write(genericRecord.copy());
         }
 
+        Transaction transaction = table.newTransaction();
+
         // submit datafiles to the table
-        AppendFiles appendFiles = table.newAppend();
+        AppendFiles appendFiles = transaction.newAppend();
         for (DataFile dataFile : unpartitionedWriter.dataFiles()) {
+           appendFiles.appendFile(dataFile);
+        }
+        transaction.commitTransaction();
+    }
+
+    @Test
+    public void writePartitionedTableData() throws Exception {
+        hadoopPartitionTableCreateTest();
+        Configuration configuration = new Configuration();
+        Catalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
+        // Load table from catalog
+        TableIdentifier name = TableIdentifier.of("logging", "logs");
+        Table table = hadoopCatalog.loadTable(name);
+
+
+        GenericAppenderFactory appenderFactory = new GenericAppenderFactory(table.schema());
+
+        int partitionId = 1, taskId = 1;
+        OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(FileFormat.PARQUET).build();
+        final PartitionKey partitionKey = new PartitionKey(table.spec(), table.spec().schema());
+        final InternalRecordWrapper recordWrapper = new InternalRecordWrapper(table.schema().asStruct());
+
+        // partitionedFanoutWriter will auto partitioned record and create the partitioned writer
+        PartitionedFanoutWriter<Record> partitionedFanoutWriter = new PartitionedFanoutWriter<Record>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES) {
+            @Override
+            protected PartitionKey partition(Record record) {
+                partitionKey.partition(recordWrapper.wrap(record));
+                return partitionKey;
+            }
+        };
+
+        GenericRecord genericRecord = GenericRecord.create(table.schema());
+
+        // assume write 1000 records
+        for (int i = 0; i < 1000; i++) {
+            GenericRecord record = genericRecord.copy();
+            record.setField("level",  i % 6 == 0 ? "error" : "info");
+            record.setField("event_time", OffsetDateTime.now());
+            record.setField("message", "Iceberg is a great table format");
+            record.setField("call_stack", Collections.singletonList("NullPointerException"));
+            partitionedFanoutWriter.write(record);
+        }
+        // 以上写入数据文件之后, 通过Table的Api对写入的数据文件提交到表的元数据中.
+        AppendFiles appendFiles = table.newAppend();
+        for (DataFile dataFile : partitionedFanoutWriter.dataFiles()) {
             appendFiles.appendFile(dataFile);
         }
-
-        // submit snapshot
-        Snapshot newSnapshot = appendFiles.apply();
+        // 提交的文件生成一个snapshot并进行提交.
+        Snapshot res = appendFiles.apply();
         appendFiles.commit();
     }
 
     @Test
-    public void test() {
+    public void testRead() throws IOException {
+//        hadoopPartitionTableCreateTest();
+        Configuration configuration = new Configuration();
+        Catalog hadoopCatalog = new HadoopCatalog(configuration, icebergWareHousePath);
+        // Load table from catalog
+        TableIdentifier name = TableIdentifier.of("logging", "logs");
+        Table table = hadoopCatalog.loadTable(name);
 
+        IcebergGenerics.ScanBuilder scanBuilder = IcebergGenerics.read(table);
+        CloseableIterator<Record> records = scanBuilder.where(Expressions.equal("level", "error")).build().iterator();
+        while (records.hasNext()) {
+            Record record = records.next();
+            // do something with record
+            System.out.println(record);
+        }
+        records.close();
     }
 }
 
