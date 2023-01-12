@@ -257,7 +257,6 @@ public class IcebergTest {
         TableIdentifier name = TableIdentifier.of("logging", "logs");
         Table table = hadoopCatalog.loadTable(name);
 
-
         GenericAppenderFactory appenderFactory = new GenericAppenderFactory(table.schema());
 
         int partitionId = 1, taskId = 1;
@@ -265,7 +264,7 @@ public class IcebergTest {
         final PartitionKey partitionKey = new PartitionKey(table.spec(), table.spec().schema());
         final InternalRecordWrapper recordWrapper = new InternalRecordWrapper(table.schema().asStruct());
 
-        // partitionedFanoutWriter will auto partitioned record and create the partitioned writer
+// partitionedFanoutWriter will auto partitioned record and create the partitioned writer
         PartitionedFanoutWriter<Record> partitionedFanoutWriter = new PartitionedFanoutWriter<Record>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES) {
             @Override
             protected PartitionKey partition(Record record) {
@@ -276,7 +275,7 @@ public class IcebergTest {
 
         GenericRecord genericRecord = GenericRecord.create(table.schema());
 
-        // assume write 1000 records
+// assume write 1000 records
         for (int i = 0; i < 1000; i++) {
             GenericRecord record = genericRecord.copy();
             record.setField("level",  i % 6 == 0 ? "error" : "info");
@@ -285,12 +284,13 @@ public class IcebergTest {
             record.setField("call_stack", Collections.singletonList("NullPointerException"));
             partitionedFanoutWriter.write(record);
         }
-        // 以上写入数据文件之后, 通过Table的Api对写入的数据文件提交到表的元数据中.
+// after the data file is written above,
+// the written data file is submitted to the metadata of the table through Table's Api.
         AppendFiles appendFiles = table.newAppend();
         for (DataFile dataFile : partitionedFanoutWriter.dataFiles()) {
             appendFiles.appendFile(dataFile);
         }
-        // 提交的文件生成一个snapshot并进行提交.
+// The submitted file generates a snapshot and submit it.
         Snapshot res = appendFiles.apply();
         appendFiles.commit();
     }
