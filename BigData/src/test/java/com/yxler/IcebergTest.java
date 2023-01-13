@@ -260,12 +260,12 @@ public class IcebergTest {
         GenericAppenderFactory appenderFactory = new GenericAppenderFactory(table.schema());
 
         int partitionId = 1, taskId = 1;
-        OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(FileFormat.PARQUET).build();
+        OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(FileFormat.ORC).build();
         final PartitionKey partitionKey = new PartitionKey(table.spec(), table.spec().schema());
         final InternalRecordWrapper recordWrapper = new InternalRecordWrapper(table.schema().asStruct());
 
 // partitionedFanoutWriter will auto partitioned record and create the partitioned writer
-        PartitionedFanoutWriter<Record> partitionedFanoutWriter = new PartitionedFanoutWriter<Record>(table.spec(), FileFormat.PARQUET, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES) {
+        PartitionedFanoutWriter<Record> partitionedFanoutWriter = new PartitionedFanoutWriter<Record>(table.spec(), FileFormat.ORC, appenderFactory, outputFileFactory, table.io(), TARGET_FILE_SIZE_IN_BYTES) {
             @Override
             protected PartitionKey partition(Record record) {
                 partitionKey.partition(recordWrapper.wrap(record));
@@ -305,7 +305,10 @@ public class IcebergTest {
         Table table = hadoopCatalog.loadTable(name);
 
         IcebergGenerics.ScanBuilder scanBuilder = IcebergGenerics.read(table);
-        CloseableIterator<Record> records = scanBuilder.where(Expressions.equal("level", "error")).build().iterator();
+
+        CloseableIterator<Record> records = scanBuilder
+//                .where(Expressions.equal("level", "error"))
+                .build().iterator();
         while (records.hasNext()) {
             Record record = records.next();
             // do something with record

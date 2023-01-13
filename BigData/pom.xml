@@ -26,6 +26,14 @@
 
 
     <dependencies>
+
+<!--        <dependency>-->
+<!--            <groupId>org.apache.iceberg</groupId>-->
+<!--            <artifactId>iceberg-spark3-runtime</artifactId>-->
+<!--            <version>0.13.2</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
         <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
@@ -60,6 +68,10 @@
                     <artifactId>parquet-hadoop</artifactId>
                     <groupId>org.apache.parquet</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>orc-shims</artifactId>
+                    <groupId>org.apache.orc</groupId>
+                </exclusion>
             </exclusions>
             <!--            <scope>provided</scope>-->
         </dependency>
@@ -69,15 +81,16 @@
             <groupId>org.scala-lang</groupId>
             <version>2.12.10</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.iceberg</groupId>
-            <artifactId>iceberg-spark3-runtime</artifactId>
-            <version>0.13.2</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.iceberg</groupId>
             <artifactId>iceberg-parquet</artifactId>
+            <version>0.14.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.iceberg</groupId>
+            <artifactId>iceberg-orc</artifactId>
             <version>0.14.1</version>
         </dependency>
 
